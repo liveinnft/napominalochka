@@ -5,5 +5,5 @@
     <solid android:color="@color/background_secondary" />
     <stroke
         android:width="2dp"
-        android:color="@color/pink_primary" />
+        android:color="@color/warm_primary" />
 </shape>

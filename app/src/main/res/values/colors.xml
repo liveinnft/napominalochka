@@ -1,44 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary Colors -->
-    <color name="pink_primary">#E91E63</color>
-    <color name="pink_primary_dark">#C2185B</color>
-    <color name="pink_accent">#FF4081</color>
-    <color name="pink_accent_dark">#F50057</color>
+    <!-- Primary Colors - Warm Ochre & Beige -->
+    <color name="warm_primary">#D4A574</color>
+    <color name="warm_primary_dark">#B8956A</color>
+    <color name="warm_accent">#E6B885</color>
+    <color name="warm_accent_dark">#C19B5C</color>
     
-    <!-- Secondary Colors -->
-    <color name="purple_light">#E1BEE7</color>
-    <color name="purple_medium">#BA68C8</color>
-    <color name="purple_dark">#8E24AA</color>
+    <!-- Secondary Colors - Muted Orange & Sage Green -->
+    <color name="orange_light">#F2D7B3</color>
+    <color name="orange_medium">#E8B882</color>
+    <color name="orange_dark">#D4A574</color>
+    <color name="sage_light">#B8C5A6</color>
+    <color name="sage_medium">#9CAF88</color>
+    <color name="sage_dark">#7A8C6B</color>
     
-    <!-- Background Colors -->
-    <color name="background_light">#FFF8E1</color>
-    <color name="background_card">#FFFFFF</color>
-    <color name="background_secondary">#F8BBD9</color>
+    <!-- Background Colors - Warm Neutrals -->
+    <color name="background_light">#FAF7F0</color>
+    <color name="background_card">#FFFEF9</color>
+    <color name="background_secondary">#F0E6D2</color>
+    <color name="background_warm">#F5F0E8</color>
     
     <!-- Text Colors -->
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
+    <color name="text_primary">#3E3427</color>
+    <color name="text_secondary">#6B5B47</color>
     <color name="text_light">#FFFFFF</color>
+    <color name="text_warm">#8B7355</color>
     
     <!-- Basic Colors -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
     
-    <!-- Status Colors -->
-    <color name="success">#4CAF50</color>
-    <color name="warning">#FF9800</color>
-    <color name="error">#F44336</color>
+    <!-- Status Colors - Earthy Tones -->
+    <color name="success">#7A8C6B</color>
+    <color name="warning">#E8B882</color>
+    <color name="error">#C17B5C</color>
     
-    <!-- Special Colors -->
-    <color name="heart_red">#FF1744</color>
-    <color name="love_gradient_start">#FF6B9D</color>
-    <color name="love_gradient_end">#C44569</color>
+    <!-- Special Colors - Warm Love Tones -->
+    <color name="heart_warm">#D4A574</color>
+    <color name="love_gradient_start">#F2D7B3</color>
+    <color name="love_gradient_end">#D4A574</color>
     
-    <!-- Battery Colors -->
-    <color name="battery_low">#FF5722</color>
-    <color name="battery_medium">#FF9800</color>
-    <color name="battery_high">#4CAF50</color>
-    <color name="battery_full">#E91E63</color>
+    <!-- Battery Colors - Natural Progression -->
+    <color name="battery_low">#C17B5C</color>
+    <color name="battery_medium">#E8B882</color>
+    <color name="battery_high">#9CAF88</color>
+    <color name="battery_full">#D4A574</color>
+    
+    <!-- Additional Warm Tones -->
+    <color name="terracotta">#C17B5C</color>
+    <color name="cream">#F5F0E8</color>
+    <color name="sand">#E6D7C3</color>
+    <color name="moss">#7A8C6B</color>
 </resources>

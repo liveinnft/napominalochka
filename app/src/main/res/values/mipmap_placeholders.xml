@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 
+    NOTE: В реальном проекте здесь должны быть PNG файлы иконок для разных плотностей экрана:
+    - mipmap-mdpi/ic_launcher.png (48x48)
+    - mipmap-hdpi/ic_launcher.png (72x72)
+    - mipmap-xhdpi/ic_launcher.png (96x96)
+    - mipmap-xxhdpi/ic_launcher.png (144x144)
+    - mipmap-xxxhdpi/ic_launcher.png (192x192)
+    
+    И соответствующие round версии для круглых иконок.
+    
+    Для создания иконок можно использовать:
+    - Android Studio Image Asset Studio
+    - Online генераторы иконок
+    - Дизайн-инструменты типа Figma, Adobe Illustrator
+    -->
+    
+    <!-- Временные drawable ресурсы -->
+    <drawable name="ic_launcher">@drawable/ic_launcher_foreground</drawable>
+    <drawable name="ic_launcher_round">@drawable/ic_launcher_foreground</drawable>
+</resources>

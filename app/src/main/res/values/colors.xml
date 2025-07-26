@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors -->
+    <color name="pink_primary">#E91E63</color>
+    <color name="pink_primary_dark">#C2185B</color>
+    <color name="pink_accent">#FF4081</color>
+    <color name="pink_accent_dark">#F50057</color>
+    
+    <!-- Secondary Colors -->
+    <color name="purple_light">#E1BEE7</color>
+    <color name="purple_medium">#BA68C8</color>
+    <color name="purple_dark">#8E24AA</color>
+    
+    <!-- Background Colors -->
+    <color name="background_light">#FFF8E1</color>
+    <color name="background_card">#FFFFFF</color>
+    <color name="background_secondary">#F8BBD9</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_light">#FFFFFF</color>
+    
+    <!-- Basic Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    
+    <!-- Status Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="error">#F44336</color>
+    
+    <!-- Special Colors -->
+    <color name="heart_red">#FF1744</color>
+    <color name="love_gradient_start">#FF6B9D</color>
+    <color name="love_gradient_end">#C44569</color>
+    
+    <!-- Battery Colors -->
+    <color name="battery_low">#FF5722</color>
+    <color name="battery_medium">#FF9800</color>
+    <color name="battery_high">#4CAF50</color>
+    <color name="battery_full">#E91E63</color>
+</resources>

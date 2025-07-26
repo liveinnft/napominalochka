@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Напоминалочка</string>
+    
+    <!-- Main Menu -->
+    <string name="mood_battery">Батарейка настроения</string>
+    <string name="journey_game">Ходилки: Путешествие к нам</string>
+    <string name="thoughts_map">Путеводитель по моим мыслям</string>
+    <string name="mission">Миссия: Не скучать</string>
+    <string name="relationship_stats">Статистика отношений</string>
+    <string name="joy_generator">Генератор радости</string>
+    <string name="diary">Дневник путешествия</string>
+    <string name="secret_surprise">Секретный сюрприз</string>
+    
+    <!-- Mood Battery -->
+    <string name="charge_love">Зарядить ❤️</string>
+    <string name="love_level">Уровень любви: %d%%</string>
+    <string name="charge_message_title">💖 Зарядка любви</string>
+    
+    <!-- Journey Game -->
+    <string name="days_remaining">Осталось дней: %d</string>
+    <string name="step_completed">Шаг %d завершен!</string>
+    <string name="final_surprise">🎁 Финальный сюрприз!</string>
+    
+    <!-- Mission -->
+    <string name="today_mission">Сегодняшняя миссия</string>
+    <string name="mission_completed">Миссия выполнена! +10 очков</string>
+    <string name="good_mood_points">Очки хорошего настроения: %d</string>
+    
+    <!-- Diary -->
+    <string name="new_entry">Новая запись</string>
+    <string name="save_entry">Сохранить</string>
+    <string name="entry_templates">Шаблоны записей</string>
+    <string name="template_remember">Сегодня вспомнила...</string>
+    <string name="template_if_you_were">Если бы ты был здесь...</string>
+    <string name="template_funny">Самое смешное за день...</string>
+    
+    <!-- Joy Generator -->
+    <string name="joke_of_day">Анекдот дня</string>
+    <string name="fact_of_day">Факт дня</string>
+    <string name="quote_of_day">Цитата дня</string>
+    <string name="meme_of_day">Мем дня</string>
+    <string name="more_button">Еще!</string>
+    
+    <!-- Common -->
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="save">Сохранить</string>
+    <string name="loading">Загрузка...</string>
+    
+    <!-- Notifications -->
+    <string name="daily_reminder_title">💕 Напоминалочка</string>
+    <string name="daily_reminder_text">Новая порция любви ждет тебя!</string>
+    
+    <!-- Secret Surprise -->
+    <string name="enter_code">Введите кодовое слово</string>
+    <string name="unlock">Разблокировать</string>
+    <string name="locked_until">Заблокировано до %s</string>
+    
+    <!-- Stats -->
+    <string name="days_together">Дней вместе</string>
+    <string name="messages_sent">Сообщений отправлено</string>
+    <string name="video_calls">Видео-звонков</string>
+    <string name="smiles_sent">Смайликов отправлено</string>
+    <string name="romance_level_today">Уровень романтики сегодня</string>
+</resources>

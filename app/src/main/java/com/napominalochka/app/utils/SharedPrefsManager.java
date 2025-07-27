@@ -99,9 +99,13 @@ public class SharedPrefsManager {
     }
 
     public String getRelationshipStartDate() {
-        // If no start date set, use current date as default
-        String defaultDate = getCurrentDate();
-        return sharedPreferences.getString(KEY_RELATIONSHIP_START_DATE, defaultDate);
+        // Fixed relationship start date - 6 октября 2024
+        return "2024-10-06";
+    }
+    
+    public String getCommunicationStartDate() {
+        // Fixed communication start date - 20 сентября 2024
+        return "2024-09-20";
     }
 
     public void setMessagesSent(int count) {
@@ -168,6 +172,22 @@ public class SharedPrefsManager {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date startDate = sdf.parse(getRelationshipStartDate());
+            Date currentDate = new Date();
+            
+            if (startDate != null) {
+                long diffInMillies = currentDate.getTime() - startDate.getTime();
+                return (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 1;
+    }
+    
+    public int getDaysCommunicating() {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date startDate = sdf.parse(getCommunicationStartDate());
             Date currentDate = new Date();
             
             if (startDate != null) {

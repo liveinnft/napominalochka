@@ -51,45 +51,26 @@ public class RelationshipStatsActivity extends AppCompatActivity {
     }
 
     private void updateAllStats() {
-        // Days together
+        // Days together (relationship)
         int daysTogether = prefsManager.getDaysTogether();
-        daysTogetherText.setText(daysTogether + " дней");
+        daysTogetherText.setText(daysTogether + " дней в отношениях 💕");
         
-        // Messages
-        int messages = prefsManager.getMessagesSent();
-        if (messages == 0) {
-            messages = 1247; // Default romantic number
-            prefsManager.setMessagesSent(messages);
-        }
-        messagesText.setText(String.format("%,d сообщений", messages));
+        // Days communicating
+        int daysCommunicating = prefsManager.getDaysCommunicating();
+        messagesText.setText(daysCommunicating + " дней общения 💬");
         
-        // Video calls
-        int videoCalls = prefsManager.getVideoCalls();
-        if (videoCalls == 0) {
-            videoCalls = 89; // Default number
-            prefsManager.setVideoCalls(videoCalls);
-        }
-        videoCallsText.setText(videoCalls + " звонков");
-        
-        // Smiles
-        int smiles = prefsManager.getSmilesSent();
-        if (smiles == 0) {
-            smiles = 3456; // Default number
-            prefsManager.setSmilesSent(smiles);
-        }
-        smilesText.setText(String.format("%,d смайликов", smiles));
+        // Hide other stats (not needed)
+        videoCallsText.setVisibility(View.GONE);
+        smilesText.setVisibility(View.GONE);
+        totalPointsText.setVisibility(View.GONE);
         
         // Romance level (random daily)
         int romanceLevel = getDailyRomanceLevel();
         romanceLevelText.setText(romanceLevel + "%");
         animateProgressBar(romanceLevel);
         
-        // Total points
-        int totalPoints = prefsManager.getMissionPoints();
-        totalPointsText.setText(totalPoints + " очков");
-        
-        // Achievements
-        updateAchievements(daysTogether, totalPoints);
+        // Achievements based on days
+        updateAchievements(daysTogether, daysCommunicating);
     }
 
     private void animateProgressBar(int targetProgress) {
@@ -108,21 +89,23 @@ public class RelationshipStatsActivity extends AppCompatActivity {
         return 85 + random.nextInt(16); // 85-100%
     }
 
-    private void updateAchievements(int days, int points) {
+    private void updateAchievements(int daysRelationship, int daysCommunication) {
         StringBuilder achievements = new StringBuilder();
         
-        if (days >= 1) achievements.append("🌟 Первый день вместе\n");
-        if (days >= 7) achievements.append("💕 Неделя любви\n");
-        if (days >= 30) achievements.append("🎉 Месяц счастья\n");
-        if (days >= 100) achievements.append("💎 100 дней вместе\n");
-        if (days >= 365) achievements.append("👑 Год любви\n");
+        // Relationship achievements
+        if (daysRelationship >= 1) achievements.append("💕 Первый день вместе\n");
+        if (daysRelationship >= 7) achievements.append("🌟 Неделя отношений\n");
+        if (daysRelationship >= 30) achievements.append("🎉 Месяц счастья\n");
+        if (daysRelationship >= 100) achievements.append("💎 100 дней вместе\n");
+        if (daysRelationship >= 365) achievements.append("👑 Год любви\n");
         
-        if (points >= 50) achievements.append("⭐ Активный игрок\n");
-        if (points >= 100) achievements.append("🏆 Мастер миссий\n");
-        if (points >= 200) achievements.append("🎯 Легенда активности\n");
+        // Communication achievements  
+        if (daysCommunication >= 30) achievements.append("💬 Месяц общения\n");
+        if (daysCommunication >= 100) achievements.append("📱 100 дней разговоров\n");
+        if (daysCommunication >= 200) achievements.append("🗣️ Болтуны профессионалы\n");
         
         if (achievements.length() == 0) {
-            achievements.append("🌱 Только начинаем!");
+            achievements.append("🌱 Только начинаем наше общение!");
         }
         
         achievementsText.setText(achievements.toString().trim());

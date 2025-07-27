@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         NotificationScheduler.scheduleDailyNotifications(this);
 
         setupMenuCards();
-        checkFirstLaunch();
+        // checkFirstLaunch(); // Removed - using fixed dates now
     }
 
     private void setupMenuCards() {

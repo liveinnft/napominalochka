@@ -49,7 +49,28 @@ public class MoodBatteryActivity extends AppCompatActivity {
     private void setupBatteryLevel() {
         int currentLevel = prefsManager.getLoveLevel();
         updateBatteryDisplay(currentLevel);
+        startBatteryDecay();
     }
+    
+    private void startBatteryDecay() {
+        // Start continuous decay every 5 seconds
+        batteryProgressBar.postDelayed(decayRunnable, 5000);
+    }
+    
+    private final Runnable decayRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int currentLevel = prefsManager.getLoveLevel();
+            if (currentLevel > 0) {
+                int newLevel = Math.max(0, currentLevel - 1); // Decrease by 1% every 5 seconds
+                prefsManager.setLoveLevel(newLevel);
+                updateBatteryDisplay(newLevel);
+                
+                // Schedule next decay
+                batteryProgressBar.postDelayed(this, 5000);
+            }
+        }
+    };
 
     private void updateBatteryDisplay(int level) {
         // Animate progress bar
@@ -63,16 +84,16 @@ public class MoodBatteryActivity extends AppCompatActivity {
         // Update status text based on level
         String statusText;
         if (level < 25) {
-            statusText = "Срочно нужна подзарядка! 💔";
+            statusText = "коть, мне нужна подзарядочка от тебя!! 💔";
             batteryStatusText.setTextColor(getColor(R.color.battery_low));
         } else if (level < 50) {
-            statusText = "Требуется немного любви 💛";
+            statusText = "котенок, дай немножко любви пожалуйста 💛";
             batteryStatusText.setTextColor(getColor(R.color.battery_medium));
         } else if (level < 75) {
-            statusText = "Хороший уровень любви! 💚";
+            statusText = "кис, так хорошо!! я чувствую твою любовь 💚";
             batteryStatusText.setTextColor(getColor(R.color.battery_high));
         } else {
-            statusText = "Переполнен любовью! 💖";
+            statusText = "я до одурения заряжен твоей любовью!! 💖";
             batteryStatusText.setTextColor(getColor(R.color.battery_full));
         }
         batteryStatusText.setText(statusText);
@@ -126,5 +147,14 @@ public class MoodBatteryActivity extends AppCompatActivity {
                 .setMessage(randomMessage)
                 .setPositiveButton(getString(R.string.ok), null)
                 .show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Stop the decay runnable to prevent memory leaks
+        if (batteryProgressBar != null) {
+            batteryProgressBar.removeCallbacks(decayRunnable);
+        }
     }
 }

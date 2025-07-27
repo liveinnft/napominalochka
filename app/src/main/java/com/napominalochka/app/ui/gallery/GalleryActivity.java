@@ -157,8 +157,8 @@ public class GalleryActivity extends AppCompatActivity {
                 imageView.setScaleType(ImageView.ScaleType.CENTER);
             }
         } else {
-            // Video not found, show placeholder
-            imageView.setImageResource(R.drawable.ic_heart);
+            // Video not found, show video icon
+            imageView.setImageResource(R.drawable.ic_video_play);
             imageView.setScaleType(ImageView.ScaleType.CENTER);
         }
 
@@ -201,69 +201,84 @@ public class GalleryActivity extends AppCompatActivity {
     }
 
     private void showVideoDialog(String[] item) {
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_video_viewer, null);
-        VideoView videoView = dialogView.findViewById(R.id.video_view);
-        TextView titleText = dialogView.findViewById(R.id.video_title);
-        TextView descriptionText = dialogView.findViewById(R.id.video_description);
-
+        // Упрощенная версия - показываем информацию о видео без воспроизведения
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("🎬 " + GalleryConfig.getTitle(item));
+        
         String fileName = GalleryConfig.getFileName(item);
         String resourceName = fileName.replaceAll("\\.[^.]*$", ""); // Remove extension if any
         
-        // Try to load from raw resources
+        // Check if video exists
         int resourceId = getResources().getIdentifier(resourceName, "raw", getPackageName());
         
-        if (resourceId != 0) {
-            // Video found in raw resources
-            Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + resourceId);
-            videoView.setVideoURI(videoUri);
-            
-            videoView.setOnPreparedListener(mp -> {
-                try {
-                    mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-                    mp.setLooping(true);
-                    mp.setVolume(0f, 0f); // Mute
-                    videoView.start();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            
-            videoView.setOnErrorListener((mp, what, extra) -> {
-                String errorMsg = "❌ Ошибка воспроизведения: " + fileName;
-                if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
-                    errorMsg += "\n🔧 Медиа-сервер недоступен";
-                } else if (what == MediaPlayer.MEDIA_ERROR_UNKNOWN) {
-                    errorMsg += "\n❓ Неизвестная ошибка медиа";
-                } else {
-                    errorMsg += "\n📋 Код ошибки: " + what + "/" + extra;
-                }
-                errorMsg += "\n\n💡 Убедитесь что:\n- Файл размещен в res/raw/\n- Имя без расширения\n- Формат: .mp4, .3gp, .webm";
-                descriptionText.setText(errorMsg);
-                return true;
-            });
-            
-        } else {
-            // Video not found
-            descriptionText.setText("❌ Видео не найдено: " + fileName + 
-                "\n\n📁 Разместите видео файл в:\napp/src/main/res/raw/" + resourceName + 
-                "\n\n💡 Имя файла БЕЗ расширения!\nПример: video1.mp4 → video1");
-        }
-
-        titleText.setText(GalleryConfig.getTitle(item));
-        descriptionText.setText(GalleryConfig.getDescription(item));
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogView)
-                .setPositiveButton("💕 Закрыть", null)
-                .create();
-                
-        dialog.setOnDismissListener(d -> {
-            if (videoView.isPlaying()) {
-                videoView.stopPlayback();
-            }
-        });
+        String message = GalleryConfig.getDescription(item) + "\n\n";
         
-        dialog.show();
+        if (resourceId != 0) {
+            message += "✅ Видео найдено: " + resourceName + "\n\n";
+            message += "🎬 Это видео файл будет воспроизводиться в полной версии приложения.\n\n";
+            message += "📱 В текущей демо-версии показывается только информация о видео.";
+        } else {
+            message += "❌ Видео не найдено: " + fileName + "\n\n";
+            message += "📁 Разместите видео файл в:\n";
+            message += "app/src/main/res/raw/" + resourceName + "\n\n";
+            message += "💡 Имя файла БЕЗ расширения!\n";
+            message += "Пример: video1.mp4 → video1";
+        }
+        
+        builder.setMessage(message);
+        builder.setPositiveButton("💕 Понятно", null);
+        
+        if (resourceId != 0) {
+            builder.setNeutralButton("🔧 Инфо о файле", (dialog, which) -> {
+                showVideoInfo(resourceName, resourceId);
+            });
+        }
+        
+        builder.show();
+    }
+    
+    private void showVideoInfo(String resourceName, int resourceId) {
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + resourceId);
+            retriever.setDataSource(this, videoUri);
+            
+            String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            String width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+            String height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+            
+            StringBuilder info = new StringBuilder();
+            info.append("📹 Информация о видео:\n\n");
+            info.append("📁 Файл: ").append(resourceName).append("\n");
+            info.append("🆔 ID ресурса: ").append(resourceId).append("\n");
+            
+            if (duration != null) {
+                long durationMs = Long.parseLong(duration);
+                long seconds = durationMs / 1000;
+                info.append("⏱️ Длительность: ").append(seconds).append(" сек\n");
+            }
+            
+            if (width != null && height != null) {
+                info.append("📐 Разрешение: ").append(width).append("x").append(height).append("\n");
+            }
+            
+            info.append("\n✅ Видео корректно загружено!");
+            
+            retriever.release();
+            
+            new AlertDialog.Builder(this)
+                    .setTitle("🔧 Техническая информация")
+                    .setMessage(info.toString())
+                    .setPositiveButton("OK", null)
+                    .show();
+                    
+        } catch (Exception e) {
+            new AlertDialog.Builder(this)
+                    .setTitle("❌ Ошибка")
+                    .setMessage("Не удалось получить информацию о видео:\n" + e.getMessage())
+                    .setPositiveButton("OK", null)
+                    .show();
+        }
     }
 
     private void showInstructionCard() {
@@ -292,6 +307,14 @@ public class GalleryActivity extends AppCompatActivity {
         instructionCard.setLayoutParams(params);
         
         galleryGrid.addView(instructionCard);
+    }
+    
+    private void addPlayIconOverlay(ImageView imageView) {
+        // Простой способ показать что это видео - изменить прозрачность
+        imageView.setAlpha(0.8f);
+        
+        // В реальном приложении здесь можно добавить overlay с иконкой play
+        // Для простоты просто делаем изображение немного прозрачным
     }
 
     @Override

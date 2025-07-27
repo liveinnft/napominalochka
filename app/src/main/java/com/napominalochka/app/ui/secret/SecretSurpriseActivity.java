@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.napominalochka.app.R;
+import com.napominalochka.app.config.AppTexts;
 import com.napominalochka.app.utils.SharedPrefsManager;
 
 public class SecretSurpriseActivity extends AppCompatActivity {
@@ -14,7 +15,7 @@ public class SecretSurpriseActivity extends AppCompatActivity {
     private TextView statusText, secretContentText;
     private Button unlockButton;
     private SharedPrefsManager prefsManager;
-    private static final String SECRET_CODE = "ЛЮБОВЬ";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,18 +66,7 @@ public class SecretSurpriseActivity extends AppCompatActivity {
 
     private void showUnlockedContent() {
         statusText.setText("🎁 РАЗБЛОКИРОВАНО!");
-        secretContentText.setText("💖 ОСОБОЕ ПОСЛАНИЕ ДЛЯ ТЕБЯ 💖\n\n" +
-                "Поздравляю! Ты нашла секретный ключ! 🗝️\n\n" +
-                "Этот сюрприз был создан специально для тебя, потому что:\n\n" +
-                "🌟 Ты освещаешь каждый мой день\n" +
-                "💫 С тобой я чувствую себя самым счастливым\n" +
-                "🦋 Ты превращаешь обычные моменты в волшебство\n" +
-                "🌈 Твоя улыбка - мой самый любимый цвет\n" +
-                "⭐ Ты - звезда, по которой я выбираю путь\n\n" +
-                "Это приложение - маленькая частичка моей души, которую я дарю тебе. " +
-                "Каждая строчка кода написана с мыслями о тебе. 💻💕\n\n" +
-                "Спасибо за то, что ты есть в моей жизни! 🙏\n\n" +
-                "С бесконечной любовью,\nТвой любящий разработчик 👨‍💻❤️");
+        secretContentText.setText(AppTexts.SECRET_MESSAGE);
         
         unlockButton.setVisibility(Button.GONE);
     }
@@ -92,7 +82,7 @@ public class SecretSurpriseActivity extends AppCompatActivity {
         builder.setPositiveButton(getString(R.string.unlock), (dialog, which) -> {
             String enteredCode = input.getText().toString().trim().toUpperCase();
             
-            if (enteredCode.equals(SECRET_CODE)) {
+            if (enteredCode.equals(AppTexts.SECRET_CODE)) {
                 prefsManager.setSecretUnlocked(true);
                 showUnlockSuccess();
                 updateUnlockStatus();

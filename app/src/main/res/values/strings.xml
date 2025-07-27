@@ -5,7 +5,7 @@
     <!-- Main Menu -->
     <string name="mood_battery">Батарейка настроения</string>
     <string name="journey_game">Ходилки: Путешествие к нам</string>
-    <string name="thoughts_map">Путеводитель по моим мыслям</string>
+    <string name="thoughts_map">📸 Наши фотографии</string>
     <string name="mission">Миссия: Не скучать</string>
     <string name="relationship_stats">Статистика отношений</string>
     <string name="joy_generator">Генератор радости</string>

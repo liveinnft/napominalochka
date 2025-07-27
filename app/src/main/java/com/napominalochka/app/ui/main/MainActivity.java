@@ -13,7 +13,7 @@ import com.napominalochka.app.R;
 import com.napominalochka.app.ui.diary.DiaryActivity;
 import com.napominalochka.app.ui.generator.JoyGeneratorActivity;
 import com.napominalochka.app.ui.journey.JourneyGameActivity;
-import com.napominalochka.app.ui.map.ThoughtsMapActivity;
+import com.napominalochka.app.ui.gallery.GalleryActivity;
 import com.napominalochka.app.ui.mission.MissionActivity;
 import com.napominalochka.app.ui.mood.MoodBatteryActivity;
 import com.napominalochka.app.ui.secret.SecretSurpriseActivity;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         // Thoughts Map Card
         CardView thoughtsMapCard = findViewById(R.id.card_thoughts_map);
         thoughtsMapCard.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, ThoughtsMapActivity.class));
+            startActivity(new Intent(MainActivity.this, GalleryActivity.class));
         });
 
         // Mission Card

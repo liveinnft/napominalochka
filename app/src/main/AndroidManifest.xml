@@ -41,7 +41,7 @@
             android:label="@string/journey_game" />
 
         <activity
-            android:name=".ui.map.ThoughtsMapActivity"
+            android:name=".ui.gallery.GalleryActivity"
             android:label="@string/thoughts_map" />
 
         <activity

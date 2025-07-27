@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import com.napominalochka.app.R;
-import com.napominalochka.app.data.JoyGeneratorData;
+import com.napominalochka.app.config.AppTexts;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -19,14 +19,14 @@ public class JoyGeneratorActivity extends AppCompatActivity {
     private Button moreJokesBtn, moreFactsBtn, moreQuotesBtn, moreMemesBtn;
     private CardView jokeCard, factCard, quoteCard, memeCard;
     
-    private JoyGeneratorData joyData;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_joy_generator);
 
-        joyData = new JoyGeneratorData();
+
         
         initViews();
         loadDailyContent();
@@ -56,34 +56,34 @@ public class JoyGeneratorActivity extends AppCompatActivity {
     }
 
     private void loadDailyContent() {
-        // Load daily content based on current date
+        // Load daily content from central config
         int dayOfYear = getDayOfYear();
         
-        jokeText.setText(joyData.getDailyJoke(dayOfYear));
-        factText.setText(joyData.getDailyFact(dayOfYear));
-        quoteText.setText(joyData.getDailyQuote(dayOfYear));
-        memeText.setText(joyData.getDailyMeme(dayOfYear));
+        jokeText.setText(getDailyContent(AppTexts.JOKES, dayOfYear));
+        factText.setText(getDailyContent(AppTexts.FACTS, dayOfYear));
+        quoteText.setText("💕 " + getDailyContent(AppTexts.LOVE_MESSAGES, dayOfYear));
+        memeText.setText("🎭 Сегодня особенный день для смеха и радости!");
     }
 
     private void setupButtons() {
-        moreJokesBtn.setOnClickListener(v -> {
+                moreJokesBtn.setOnClickListener(v -> {
             animateCard(jokeCard);
-            jokeText.setText(joyData.getRandomJoke());
+            jokeText.setText(getRandomContent(AppTexts.JOKES));
         });
-        
+
         moreFactsBtn.setOnClickListener(v -> {
             animateCard(factCard);
-            factText.setText(joyData.getRandomFact());
+            factText.setText(getRandomContent(AppTexts.FACTS));
         });
-        
+
         moreQuotesBtn.setOnClickListener(v -> {
             animateCard(quoteCard);
-            quoteText.setText(joyData.getRandomQuote());
+            quoteText.setText("💕 " + getRandomContent(AppTexts.LOVE_MESSAGES));
         });
-        
+
         moreMemesBtn.setOnClickListener(v -> {
             animateCard(memeCard);
-            memeText.setText(joyData.getRandomMeme());
+            memeText.setText("🎭 " + getRandomContent(AppTexts.LOVE_MESSAGES));
         });
     }
 
@@ -96,6 +96,16 @@ public class JoyGeneratorActivity extends AppCompatActivity {
     private int getDayOfYear() {
         SimpleDateFormat dayFormat = new SimpleDateFormat("DDD", Locale.getDefault());
         return Integer.parseInt(dayFormat.format(new Date()));
+    }
+
+    private String getDailyContent(String[] contentArray, int dayOfYear) {
+        if (contentArray.length == 0) return "Контент скоро появится!";
+        return contentArray[dayOfYear % contentArray.length];
+    }
+    
+    private String getRandomContent(String[] contentArray) {
+        if (contentArray.length == 0) return "Контент скоро появится!";
+        return contentArray[new java.util.Random().nextInt(contentArray.length)];
     }
 
     @Override

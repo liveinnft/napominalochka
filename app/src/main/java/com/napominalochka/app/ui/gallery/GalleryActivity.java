@@ -131,42 +131,33 @@ public class GalleryActivity extends AppCompatActivity {
         ));
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         
-        try {
-            String fileName = GalleryConfig.getFileName(item);
-            
-            // Try to create thumbnail from raw resources first
+        String fileName = GalleryConfig.getFileName(item);
+        String resourceName = fileName.replaceAll("\\.[^.]*$", ""); // Remove extension if any
+        
+        // Try to load from raw resources
+        int resourceId = getResources().getIdentifier(resourceName, "raw", getPackageName());
+        
+        if (resourceId != 0) {
             try {
-                String resourceName = fileName.replaceAll("\\.[^.]*$", ""); // Remove extension
-                int resourceId = getResources().getIdentifier(resourceName, "raw", getPackageName());
-                if (resourceId != 0) {
-                    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                    Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + resourceId);
-                    retriever.setDataSource(this, videoUri);
-                    Bitmap thumbnail = retriever.getFrameAtTime(0);
-                    imageView.setImageBitmap(thumbnail);
-                    retriever.release();
-                } else {
-                    // Fallback to assets
-                    AssetFileDescriptor afd = getAssets().openFd("gallery/" + fileName);
-                    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                    retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                    Bitmap thumbnail = retriever.getFrameAtTime(0);
-                    imageView.setImageBitmap(thumbnail);
-                    retriever.release();
-                    afd.close();
-                }
-            } catch (Exception e) {
-                // Fallback to assets
-                AssetFileDescriptor afd = getAssets().openFd("gallery/" + fileName);
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + resourceId);
+                retriever.setDataSource(this, videoUri);
                 Bitmap thumbnail = retriever.getFrameAtTime(0);
-                imageView.setImageBitmap(thumbnail);
+                if (thumbnail != null) {
+                    imageView.setImageBitmap(thumbnail);
+                } else {
+                    // Show play icon if no thumbnail
+                    imageView.setImageResource(R.drawable.ic_heart);
+                    imageView.setScaleType(ImageView.ScaleType.CENTER);
+                }
                 retriever.release();
-                afd.close();
+            } catch (Exception e) {
+                // Show play icon if thumbnail fails
+                imageView.setImageResource(R.drawable.ic_heart);
+                imageView.setScaleType(ImageView.ScaleType.CENTER);
             }
-        } catch (Exception e) {
-            // Show placeholder if video processing fails
+        } else {
+            // Video not found, show placeholder
             imageView.setImageResource(R.drawable.ic_heart);
             imageView.setScaleType(ImageView.ScaleType.CENTER);
         }
@@ -215,36 +206,47 @@ public class GalleryActivity extends AppCompatActivity {
         TextView titleText = dialogView.findViewById(R.id.video_title);
         TextView descriptionText = dialogView.findViewById(R.id.video_description);
 
-        try {
-            String fileName = GalleryConfig.getFileName(item);
+        String fileName = GalleryConfig.getFileName(item);
+        String resourceName = fileName.replaceAll("\\.[^.]*$", ""); // Remove extension if any
+        
+        // Try to load from raw resources
+        int resourceId = getResources().getIdentifier(resourceName, "raw", getPackageName());
+        
+        if (resourceId != 0) {
+            // Video found in raw resources
+            Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + resourceId);
+            videoView.setVideoURI(videoUri);
             
-            // Try to load from raw resources first (recommended for videos)
-            try {
-                String resourceName = fileName.replaceAll("\\.[^.]*$", ""); // Remove extension
-                int resourceId = getResources().getIdentifier(resourceName, "raw", getPackageName());
-                if (resourceId != 0) {
-                    videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + resourceId));
-                } else {
-                    // Fallback to assets
-                    videoView.setVideoURI(Uri.parse("file:///android_asset/gallery/" + fileName));
-                }
-            } catch (Exception e) {
-                // Fallback to assets
-                videoView.setVideoURI(Uri.parse("file:///android_asset/gallery/" + fileName));
-            }
-            
-            // Auto-play without sound
             videoView.setOnPreparedListener(mp -> {
-                mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-                mp.setLooping(true);
-                mp.setVolume(0f, 0f); // Mute
-                videoView.start();
+                try {
+                    mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+                    mp.setLooping(true);
+                    mp.setVolume(0f, 0f); // Mute
+                    videoView.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
             
-        } catch (Exception e) {
-            // If video loading fails, show error message  
-            descriptionText.setText("Ошибка загрузки видео: " + GalleryConfig.getFileName(item) + 
-                "\n\nВидео можно разместить в:\n- app/src/main/res/raw/ (рекомендуется)\n- app/src/main/assets/gallery/");
+            videoView.setOnErrorListener((mp, what, extra) -> {
+                String errorMsg = "❌ Ошибка воспроизведения: " + fileName;
+                if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
+                    errorMsg += "\n🔧 Медиа-сервер недоступен";
+                } else if (what == MediaPlayer.MEDIA_ERROR_UNKNOWN) {
+                    errorMsg += "\n❓ Неизвестная ошибка медиа";
+                } else {
+                    errorMsg += "\n📋 Код ошибки: " + what + "/" + extra;
+                }
+                errorMsg += "\n\n💡 Убедитесь что:\n- Файл размещен в res/raw/\n- Имя без расширения\n- Формат: .mp4, .3gp, .webm";
+                descriptionText.setText(errorMsg);
+                return true;
+            });
+            
+        } else {
+            // Video not found
+            descriptionText.setText("❌ Видео не найдено: " + fileName + 
+                "\n\n📁 Разместите видео файл в:\napp/src/main/res/raw/" + resourceName + 
+                "\n\n💡 Имя файла БЕЗ расширения!\nПример: video1.mp4 → video1");
         }
 
         titleText.setText(GalleryConfig.getTitle(item));

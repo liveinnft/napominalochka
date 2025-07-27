@@ -3,6 +3,7 @@ package com.napominalochka.app.ui.stats;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;

@@ -1,0 +1,8 @@
+# PLACEHOLDER FOR VIDEO FILE
+# 
+# To add actual video:
+# 1. Replace this file with your .mp4, .3gp, or .webm video
+# 2. Keep filename as: sample_video (no extension!)
+# 3. Update GalleryConfig.java if needed
+#
+# This placeholder exists so Android Studio recognizes the resource

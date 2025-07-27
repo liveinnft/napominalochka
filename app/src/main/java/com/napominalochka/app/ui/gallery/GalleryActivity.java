@@ -7,12 +7,15 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.VideoView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -201,9 +204,20 @@ public class GalleryActivity extends AppCompatActivity {
     }
 
     private void showVideoDialog(String[] item) {
-        // Упрощенная версия - показываем информацию о видео без воспроизведения
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🎬 " + GalleryConfig.getTitle(item));
+        // Полная версия с воспроизведением видео
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_video_player, null);
+        
+        TextView titleText = dialogView.findViewById(R.id.video_title);
+        TextView descriptionText = dialogView.findViewById(R.id.video_description);
+        SurfaceView surfaceView = dialogView.findViewById(R.id.surface_view);
+        ProgressBar loadingProgress = dialogView.findViewById(R.id.loading_progress);
+        TextView statusText = dialogView.findViewById(R.id.status_text);
+        Button playPauseButton = dialogView.findViewById(R.id.play_pause_button);
+        Button closeButton = dialogView.findViewById(R.id.close_button);
+        
+        // Set basic info
+        titleText.setText("🎬 " + GalleryConfig.getTitle(item));
+        descriptionText.setText(GalleryConfig.getDescription(item));
         
         String fileName = GalleryConfig.getFileName(item);
         String resourceName = fileName.replaceAll("\\.[^.]*$", ""); // Remove extension if any
@@ -211,30 +225,132 @@ public class GalleryActivity extends AppCompatActivity {
         // Check if video exists
         int resourceId = getResources().getIdentifier(resourceName, "raw", getPackageName());
         
-        String message = GalleryConfig.getDescription(item) + "\n\n";
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
         
         if (resourceId != 0) {
-            message += "✅ Видео найдено: " + resourceName + "\n\n";
-            message += "🎬 Это видео файл будет воспроизводиться в полной версии приложения.\n\n";
-            message += "📱 В текущей демо-версии показывается только информация о видео.";
+            // Video found - initialize MediaPlayer
+            setupVideoPlayer(surfaceView, resourceId, loadingProgress, statusText, playPauseButton, dialog);
         } else {
-            message += "❌ Видео не найдено: " + fileName + "\n\n";
-            message += "📁 Разместите видео файл в:\n";
-            message += "app/src/main/res/raw/" + resourceName + "\n\n";
-            message += "💡 Имя файла БЕЗ расширения!\n";
-            message += "Пример: video1.mp4 → video1";
+            // Video not found
+            loadingProgress.setVisibility(View.GONE);
+            statusText.setText("❌ Видео не найдено: " + fileName + 
+                "\n\n📁 Разместите видео в:\napp/src/main/res/raw/" + resourceName);
+            playPauseButton.setEnabled(false);
         }
         
-        builder.setMessage(message);
-        builder.setPositiveButton("💕 Понятно", null);
+        closeButton.setOnClickListener(v -> dialog.dismiss());
         
-        if (resourceId != 0) {
-            builder.setNeutralButton("🔧 Инфо о файле", (dialog, which) -> {
-                showVideoInfo(resourceName, resourceId);
-            });
-        }
+        dialog.show();
+    }
+    
+    private void setupVideoPlayer(SurfaceView surfaceView, int resourceId, ProgressBar loadingProgress, 
+                                 TextView statusText, Button playPauseButton, AlertDialog dialog) {
         
-        builder.show();
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        final boolean[] isPlaying = {false};
+        final boolean[] isPrepared = {false};
+        
+        SurfaceHolder holder = surfaceView.getHolder();
+        holder.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                try {
+                    mediaPlayer.setDisplay(holder);
+                    
+                    // Load video from raw resources
+                    Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + resourceId);
+                    mediaPlayer.setDataSource(GalleryActivity.this, videoUri);
+                    
+                    statusText.setText("⏳ Подготовка видео...");
+                    
+                    mediaPlayer.setOnPreparedListener(mp -> {
+                        isPrepared[0] = true;
+                        loadingProgress.setVisibility(View.GONE);
+                        statusText.setVisibility(View.GONE);
+                        playPauseButton.setEnabled(true);
+                        
+                        // Auto-start video
+                        mp.setLooping(true);
+                        mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+                        mp.start();
+                        isPlaying[0] = true;
+                        playPauseButton.setText("⏸️ Пауза");
+                        
+                        // Mute audio
+                        mp.setVolume(0f, 0f);
+                    });
+                    
+                    mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                        loadingProgress.setVisibility(View.GONE);
+                        String errorMsg = "❌ Ошибка воспроизведения\n";
+                        
+                        if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
+                            errorMsg += "🔧 Медиа-сервер недоступен";
+                        } else if (what == MediaPlayer.MEDIA_ERROR_UNKNOWN) {
+                            errorMsg += "❓ Неизвестная ошибка";
+                        } else {
+                            errorMsg += "📋 Код: " + what + "/" + extra;
+                        }
+                        
+                        statusText.setText(errorMsg);
+                        statusText.setVisibility(View.VISIBLE);
+                        playPauseButton.setEnabled(false);
+                        return true;
+                    });
+                    
+                    mediaPlayer.prepareAsync();
+                    
+                } catch (Exception e) {
+                    loadingProgress.setVisibility(View.GONE);
+                    statusText.setText("❌ Ошибка загрузки:\n" + e.getMessage());
+                    statusText.setVisibility(View.VISIBLE);
+                    playPauseButton.setEnabled(false);
+                }
+            }
+            
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                // Surface changed
+            }
+            
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                if (mediaPlayer != null) {
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
+                    }
+                    mediaPlayer.release();
+                }
+            }
+        });
+        
+        // Play/Pause button logic
+        playPauseButton.setOnClickListener(v -> {
+            if (isPrepared[0] && mediaPlayer != null) {
+                if (isPlaying[0]) {
+                    mediaPlayer.pause();
+                    isPlaying[0] = false;
+                    playPauseButton.setText("▶️ Играть");
+                } else {
+                    mediaPlayer.start();
+                    isPlaying[0] = true;
+                    playPauseButton.setText("⏸️ Пауза");
+                }
+            }
+        });
+        
+        // Cleanup on dialog dismiss
+        dialog.setOnDismissListener(d -> {
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+                mediaPlayer.release();
+            }
+        });
     }
     
     private void showVideoInfo(String resourceName, int resourceId) {

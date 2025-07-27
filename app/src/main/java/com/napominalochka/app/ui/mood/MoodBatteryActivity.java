@@ -80,18 +80,29 @@ public class MoodBatteryActivity extends AppCompatActivity {
 
     private void setupChargeButton() {
         chargeButton.setOnClickListener(v -> {
+            // Prevent spam clicking
+            if (!chargeButton.isEnabled()) return;
+            
             // Add charge animation
             animateChargeButton();
             
             // Show random love message
             showLoveMessage();
             
-            // Increase love level
+            // Increase love level with limit
             int currentLevel = prefsManager.getLoveLevel();
-            int newLevel = Math.min(100, currentLevel + new Random().nextInt(20) + 10);
-            prefsManager.setLoveLevel(newLevel);
+            int increase = new Random().nextInt(20) + 10;
+            int newLevel = Math.min(100, currentLevel + increase);
             
-            updateBatteryDisplay(newLevel);
+            // Only update if actually increased
+            if (newLevel > currentLevel) {
+                prefsManager.setLoveLevel(newLevel);
+                updateBatteryDisplay(newLevel);
+                
+                // Add cooldown to prevent spam (2 seconds)
+                chargeButton.setEnabled(false);
+                chargeButton.postDelayed(() -> chargeButton.setEnabled(true), 2000);
+            }
         });
     }
 

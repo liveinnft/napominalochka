@@ -169,29 +169,43 @@ public class JourneyGameActivity extends AppCompatActivity {
         String today = sdf.format(new Date());
         String startDate = prefsManager.getRelationshipStartDate();
         
+        // Safety check for start date
+        if (startDate == null || startDate.isEmpty()) {
+            return 1; // Safe default
+        }
+        
         try {
             Date start = sdf.parse(startDate);
             Date current = sdf.parse(today);
             if (start != null && current != null) {
                 long diffInMillies = current.getTime() - start.getTime();
+                
+                // Ensure non-negative difference (start date not in future)
+                if (diffInMillies < 0) {
+                    return 1; // If start date is in future, start from day 1
+                }
+                
                 int daysPassed = (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
-                return Math.min(daysPassed, TOTAL_DAYS);
+                return Math.min(Math.max(1, daysPassed), TOTAL_DAYS); // Ensure between 1 and TOTAL_DAYS
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         
-        return 1; // Default to day 1
+        return 1; // Safe default
     }
 
     private void updateProgress() {
         int currentDay = getCurrentDay();
         int completedDays = prefsManager.getJourneyProgress();
-        int remainingDays = TOTAL_DAYS - completedDays;
+        int remainingDays = Math.max(0, TOTAL_DAYS - completedDays);
         
         daysRemainingText.setText(getString(R.string.days_remaining, remainingDays));
+        
+        // Safe percentage calculation
+        int percentage = (TOTAL_DAYS > 0) ? (completedDays * 100 / TOTAL_DAYS) : 0;
         progressText.setText("Прогресс: " + completedDays + " из " + TOTAL_DAYS + " дней (" + 
-                           (completedDays * 100 / TOTAL_DAYS) + "%)");
+                           percentage + "%)");
     }
 
     @Override

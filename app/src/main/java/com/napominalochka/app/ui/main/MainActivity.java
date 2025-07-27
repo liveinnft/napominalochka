@@ -19,6 +19,12 @@ import com.napominalochka.app.ui.mood.MoodBatteryActivity;
 import com.napominalochka.app.ui.secret.SecretSurpriseActivity;
 import com.napominalochka.app.ui.stats.RelationshipStatsActivity;
 import com.napominalochka.app.utils.NotificationScheduler;
+import com.napominalochka.app.utils.SharedPrefsManager;
+import android.app.AlertDialog;
+import android.widget.EditText;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         NotificationScheduler.scheduleDailyNotifications(this);
 
         setupMenuCards();
+        checkFirstLaunch();
     }
 
     private void setupMenuCards() {
@@ -81,5 +88,57 @@ public class MainActivity extends AppCompatActivity {
         secretCard.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, SecretSurpriseActivity.class));
         });
+    }
+
+    private void checkFirstLaunch() {
+        SharedPrefsManager prefsManager = new SharedPrefsManager(this);
+        String startDate = prefsManager.getRelationshipStartDate();
+        
+        // Check if start date equals current date (default), indicating first launch
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        if (startDate.equals(currentDate) && !getSharedPreferences("app_prefs", MODE_PRIVATE).getBoolean("setup_completed", false)) {
+            showFirstLaunchDialog(prefsManager);
+        }
+    }
+
+    private void showFirstLaunchDialog(SharedPrefsManager prefsManager) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("💕 Добро пожаловать в Напоминалочку!");
+        builder.setMessage("Когда начались ваши отношения? Это поможет настроить игру 'Путешествие к нам'.");
+        builder.setCancelable(false);
+        
+        EditText dateInput = new EditText(this);
+        dateInput.setHint("Дата начала отношений (ГГГГ-ММ-ДД)");
+        dateInput.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()));
+        builder.setView(dateInput);
+        
+        builder.setPositiveButton("Сохранить 💖", (dialog, which) -> {
+            String inputDate = dateInput.getText().toString().trim();
+            
+            // Basic validation
+            if (inputDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                prefsManager.setRelationshipStartDate(inputDate);
+                getSharedPreferences("app_prefs", MODE_PRIVATE).edit().putBoolean("setup_completed", true).apply();
+                
+                new AlertDialog.Builder(this)
+                        .setTitle("✅ Настройка завершена!")
+                        .setMessage("Теперь все функции приложения готовы к использованию! 🎉")
+                        .setPositiveButton("Начать! 🚀", null)
+                        .show();
+            } else {
+                new AlertDialog.Builder(this)
+                        .setTitle("❌ Неверный формат")
+                        .setMessage("Пожалуйста, используйте формат ГГГГ-ММ-ДД (например: 2024-01-15)")
+                        .setPositiveButton("Понятно", (d, w) -> showFirstLaunchDialog(prefsManager))
+                        .show();
+            }
+        });
+        
+        builder.setNegativeButton("Позже", (dialog, which) -> {
+            // Use current date as default
+            getSharedPreferences("app_prefs", MODE_PRIVATE).edit().putBoolean("setup_completed", true).apply();
+        });
+        
+        builder.show();
     }
 }

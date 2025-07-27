@@ -99,7 +99,9 @@ public class SharedPrefsManager {
     }
 
     public String getRelationshipStartDate() {
-        return sharedPreferences.getString(KEY_RELATIONSHIP_START_DATE, getCurrentDate());
+        // If no start date set, use current date as default
+        String defaultDate = getCurrentDate();
+        return sharedPreferences.getString(KEY_RELATIONSHIP_START_DATE, defaultDate);
     }
 
     public void setMessagesSent(int count) {

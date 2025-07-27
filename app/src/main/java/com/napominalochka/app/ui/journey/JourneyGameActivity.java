@@ -99,7 +99,8 @@ public class JourneyGameActivity extends AppCompatActivity {
         // Set click listener
         if (isUnlocked && day > prefsManager.getJourneyProgress()) {
             card.setOnClickListener(v -> openDayContent(day));
-            card.setForeground(getDrawable(android.R.attr.selectableItemBackground));
+            card.setClickable(true);
+            card.setFocusable(true);
         }
 
         return card;

@@ -70,7 +70,8 @@ public class ThoughtsMapActivity extends AppCompatActivity {
         
         if (!isLocked) {
             card.setOnClickListener(v -> showIslandContent(title, content));
-            card.setForeground(getDrawable(android.R.attr.selectableItemBackground));
+            card.setClickable(true);
+            card.setFocusable(true);
         }
         
         return card;

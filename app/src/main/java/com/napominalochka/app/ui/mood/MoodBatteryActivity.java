@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.napominalochka.app.R;
-import com.napominalochka.app.data.MoodBatteryData;
+import com.napominalochka.app.config.AppTexts;
 import com.napominalochka.app.utils.SharedPrefsManager;
 
 import java.util.Random;
@@ -24,7 +24,6 @@ public class MoodBatteryActivity extends AppCompatActivity {
     private Button chargeButton;
     
     private SharedPrefsManager prefsManager;
-    private MoodBatteryData moodData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +31,6 @@ public class MoodBatteryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_mood_battery);
 
         prefsManager = new SharedPrefsManager(this);
-        moodData = new MoodBatteryData();
 
         initViews();
         setupBatteryLevel();
@@ -139,8 +137,7 @@ public class MoodBatteryActivity extends AppCompatActivity {
     }
 
     private void showLoveMessage() {
-        String[] messages = moodData.getLoveMessages();
-        String randomMessage = messages[new Random().nextInt(messages.length)];
+        String randomMessage = AppTexts.LOVE_MESSAGES[new Random().nextInt(AppTexts.LOVE_MESSAGES.length)];
         
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.charge_message_title))

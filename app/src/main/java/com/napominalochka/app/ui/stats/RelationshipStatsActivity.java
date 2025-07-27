@@ -15,10 +15,9 @@ import java.util.Random;
 
 public class RelationshipStatsActivity extends AppCompatActivity {
     
-    private TextView daysTogetherText, messagesText, videoCallsText, smilesText;
-    private TextView romanceLevelText, totalPointsText, achievementsText;
+    private TextView daysTogetherText, communicationText;
+    private TextView romanceLevelText, achievementsText;
     private ProgressBar romanceProgressBar;
-    private Button editStatsButton;
     
     private SharedPrefsManager prefsManager;
 
@@ -31,7 +30,6 @@ public class RelationshipStatsActivity extends AppCompatActivity {
         
         initViews();
         updateAllStats();
-        setupEditButton();
         
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -41,14 +39,10 @@ public class RelationshipStatsActivity extends AppCompatActivity {
 
     private void initViews() {
         daysTogetherText = findViewById(R.id.days_together_text);
-        messagesText = findViewById(R.id.messages_text);
-        videoCallsText = findViewById(R.id.video_calls_text);
-        smilesText = findViewById(R.id.smiles_text);
+        communicationText = findViewById(R.id.messages_text); // Переиспользуем для дней общения
         romanceLevelText = findViewById(R.id.romance_level_text);
-        totalPointsText = findViewById(R.id.total_points_text);
         achievementsText = findViewById(R.id.achievements_text);
         romanceProgressBar = findViewById(R.id.romance_progress_bar);
-        editStatsButton = findViewById(R.id.edit_stats_button);
     }
 
     private void updateAllStats() {
@@ -58,12 +52,7 @@ public class RelationshipStatsActivity extends AppCompatActivity {
         
         // Days communicating
         int daysCommunicating = prefsManager.getDaysCommunicating();
-        messagesText.setText(daysCommunicating + " дней общения 💬");
-        
-        // Hide other stats (not needed)
-        videoCallsText.setVisibility(View.GONE);
-        smilesText.setVisibility(View.GONE);
-        totalPointsText.setVisibility(View.GONE);
+        communicationText.setText(daysCommunicating + " дней общения 💬");
         
         // Romance level (random daily)
         int romanceLevel = getDailyRomanceLevel();
@@ -112,66 +101,7 @@ public class RelationshipStatsActivity extends AppCompatActivity {
         achievementsText.setText(achievements.toString().trim());
     }
 
-    private void setupEditButton() {
-        editStatsButton.setOnClickListener(v -> showEditDialog());
-    }
 
-    private void showEditDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("📝 Редактировать статистику");
-        
-        // Create input fields
-        EditText messagesInput = new EditText(this);
-        messagesInput.setHint("Количество сообщений");
-        messagesInput.setText(String.valueOf(prefsManager.getMessagesSent()));
-        
-        EditText callsInput = new EditText(this);
-        callsInput.setHint("Количество видео-звонков");
-        callsInput.setText(String.valueOf(prefsManager.getVideoCalls()));
-        
-        EditText smilesInput = new EditText(this);
-        smilesInput.setHint("Количество смайликов");
-        smilesInput.setText(String.valueOf(prefsManager.getSmilesSent()));
-        
-        // Create layout
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.addView(messagesInput);
-        layout.addView(callsInput);
-        layout.addView(smilesInput);
-        
-        builder.setView(layout);
-        
-        builder.setPositiveButton("Сохранить 💾", (dialog, which) -> {
-            try {
-                int messages = Integer.parseInt(messagesInput.getText().toString());
-                int calls = Integer.parseInt(callsInput.getText().toString());
-                int smiles = Integer.parseInt(smilesInput.getText().toString());
-                
-                prefsManager.setMessagesSent(messages);
-                prefsManager.setVideoCalls(calls);
-                prefsManager.setSmilesSent(smiles);
-                
-                updateAllStats();
-                
-                new AlertDialog.Builder(this)
-                        .setTitle("✅ Успешно!")
-                        .setMessage("Статистика обновлена! Теперь цифры отражают вашу реальную активность 💕")
-                        .setPositiveButton("Отлично!", null)
-                        .show();
-                        
-            } catch (NumberFormatException e) {
-                new AlertDialog.Builder(this)
-                        .setTitle("❌ Ошибка")
-                        .setMessage("Пожалуйста, введите корректные числа")
-                        .setPositiveButton("Понятно", null)
-                        .show();
-            }
-        });
-        
-        builder.setNegativeButton("Отмена", null);
-        builder.show();
-    }
 
     @Override
     public boolean onSupportNavigateUp() {

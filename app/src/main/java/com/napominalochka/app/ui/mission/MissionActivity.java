@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.napominalochka.app.R;
-import com.napominalochka.app.data.MissionData;
+import com.napominalochka.app.config.AppTexts;
 import com.napominalochka.app.utils.SharedPrefsManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,8 +24,7 @@ public class MissionActivity extends AppCompatActivity {
     private Button getMissionButton;
     
     private SharedPrefsManager prefsManager;
-    private MissionData missionData;
-    private MissionData.Mission currentMission;
+    private String[] currentMission; // [0] = title, [1] = description
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +32,6 @@ public class MissionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_mission);
 
         prefsManager = new SharedPrefsManager(this);
-        missionData = new MissionData();
 
         initViews();
         setupMission();
@@ -76,10 +74,10 @@ public class MissionActivity extends AppCompatActivity {
     private void showCurrentMission() {
         String todayMission = getTodayMission();
         if (todayMission != null) {
-            currentMission = missionData.getMissionByTitle(todayMission);
+            currentMission = findMissionByTitle(todayMission);
             if (currentMission != null) {
-                todayMissionText.setText("🎯 " + currentMission.getTitle());
-                missionDescriptionText.setText(currentMission.getDescription());
+                todayMissionText.setText("🎯 " + currentMission[0]);
+                missionDescriptionText.setText(currentMission[1]);
                 
                 getMissionButton.setVisibility(Button.GONE);
                 completeMissionButton.setVisibility(Button.VISIBLE);
@@ -93,16 +91,17 @@ public class MissionActivity extends AppCompatActivity {
         // Animate button
         animateButton(getMissionButton);
         
-        // Get random mission
-        currentMission = missionData.getRandomMission();
+        // Get random mission from central config
+        int randomIndex = new Random().nextInt(AppTexts.MISSIONS.length);
+        currentMission = AppTexts.MISSIONS[randomIndex];
         
         // Save mission for today
         prefsManager.setLastMissionDate(getCurrentDate());
-        saveTodayMission(currentMission.getTitle());
+        saveTodayMission(currentMission[0]);
         
         // Update UI
-        todayMissionText.setText("🎯 " + currentMission.getTitle());
-        missionDescriptionText.setText(currentMission.getDescription());
+        todayMissionText.setText("🎯 " + currentMission[0]);
+        missionDescriptionText.setText(currentMission[1]);
         
         getMissionButton.setVisibility(Button.GONE);
         completeMissionButton.setVisibility(Button.VISIBLE);
@@ -207,5 +206,14 @@ public class MissionActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+    
+    private String[] findMissionByTitle(String title) {
+        for (String[] mission : AppTexts.MISSIONS) {
+            if (mission[0].equals(title)) {
+                return mission;
+            }
+        }
+        return null;
     }
 }

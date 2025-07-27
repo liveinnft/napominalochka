@@ -2,6 +2,7 @@ package com.napominalochka.app.ui.journey;
 
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridLayout;
@@ -9,7 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import com.napominalochka.app.R;
-import com.napominalochka.app.data.JourneyGameData;
+import com.napominalochka.app.config.AppTexts;
 import com.napominalochka.app.utils.SharedPrefsManager;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,7 +22,7 @@ public class JourneyGameActivity extends AppCompatActivity {
     private TextView daysRemainingText;
     private TextView progressText;
     private SharedPrefsManager prefsManager;
-    private JourneyGameData gameData;
+
     private static final int TOTAL_DAYS = 20;
 
     @Override
@@ -30,7 +31,6 @@ public class JourneyGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_journey_game);
 
         prefsManager = new SharedPrefsManager(this);
-        gameData = new JourneyGameData();
 
         initViews();
         setupGameBoard();
@@ -113,7 +113,8 @@ public class JourneyGameActivity extends AppCompatActivity {
     }
 
     private void openDayContent(int day) {
-        JourneyGameData.DayContent content = gameData.getDayContent(day);
+        // Get content from centralized config
+        String[] content = AppTexts.JOURNEY_CONTENT[day - 1]; // day is 1-based, array is 0-based
         
         // Animate card selection
         animateCardSelection(day);
@@ -121,7 +122,7 @@ public class JourneyGameActivity extends AppCompatActivity {
         // Show content dialog
         new AlertDialog.Builder(this)
                 .setTitle("День " + day + " 🎁")
-                .setMessage(content.getTitle() + "\n\n" + content.getContent())
+                .setMessage(content[0] + "\n\n" + content[1]) // [0] = title, [1] = content
                 .setPositiveButton("Прочитано! ❤️", (dialog, which) -> {
                     markDayCompleted(day);
                     updateProgress();
@@ -163,30 +164,27 @@ public class JourneyGameActivity extends AppCompatActivity {
     }
 
     private int getCurrentDay() {
-        // For demo purposes, unlock one day per real day
-        // In real app, you might want different logic
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String today = sdf.format(new Date());
-        String startDate = prefsManager.getRelationshipStartDate();
+        // Check when app was first launched and unlock one day per day since then
+        SharedPreferences appPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        String firstLaunchDate = appPrefs.getString("first_launch_date", "");
         
-        // Safety check for start date
-        if (startDate == null || startDate.isEmpty()) {
-            return 1; // Safe default
+        if (firstLaunchDate.isEmpty()) {
+            // First launch - set current date and return day 1
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String today = sdf.format(new Date());
+            appPrefs.edit().putString("first_launch_date", today).apply();
+            return 1;
         }
         
         try {
-            Date start = sdf.parse(startDate);
-            Date current = sdf.parse(today);
-            if (start != null && current != null) {
-                long diffInMillies = current.getTime() - start.getTime();
-                
-                // Ensure non-negative difference (start date not in future)
-                if (diffInMillies < 0) {
-                    return 1; // If start date is in future, start from day 1
-                }
-                
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date firstLaunch = sdf.parse(firstLaunchDate);
+            Date current = new Date();
+            
+            if (firstLaunch != null) {
+                long diffInMillies = current.getTime() - firstLaunch.getTime();
                 int daysPassed = (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
-                return Math.min(Math.max(1, daysPassed), TOTAL_DAYS); // Ensure between 1 and TOTAL_DAYS
+                return Math.min(Math.max(1, daysPassed), TOTAL_DAYS);
             }
         } catch (Exception e) {
             e.printStackTrace();

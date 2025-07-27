@@ -138,22 +138,8 @@ public class DiaryActivity extends AppCompatActivity {
     }
 
     private void loadDiaryEntries() {
-        // Load sample entries for demonstration
-        addSampleEntries();
-    }
-
-    private void addSampleEntries() {
-        String[] sampleEntries = {
-            "Сегодня особенный день! Думала о том, как мы смеялись вчера. Твой смех - самая красивая мелодия в мире. 💕",
-            "Если бы ты был здесь... мы бы гуляли по парку, держась за руки. Представляю, как мы кормим уток и строим планы на будущее. 🦆",
-            "Самое смешное за день: пыталась приготовить твое любимое блюдо и почти сожгла кухню! 😅 Хорошо, что ты любишь меня не за кулинарные таланты!",
-            "Сегодня видела пару, которая напомнила мне о нас. Они так нежно смотрели друг на друга... Скорее бы увидеться! ❤️"
-        };
-        
-        for (int i = 0; i < sampleEntries.length; i++) {
-            String date = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(new Date(System.currentTimeMillis() - (i * 24 * 60 * 60 * 1000)));
-            createEntryCard(date + " 20:00", sampleEntries[i]);
-        }
+        // Load saved entries from SharedPreferences
+        // For now, start with empty diary - user will create their own entries
     }
 
     private void createEntryCard(String date, String text) {

@@ -13,6 +13,7 @@ public class SharedPrefsManager {
     // Keys
     private static final String KEY_LOVE_LEVEL = "love_level";
     private static final String KEY_LAST_UPDATE_DATE = "last_update_date";
+    private static final String KEY_LAST_BATTERY_UPDATE = "last_battery_update";
     private static final String KEY_JOURNEY_PROGRESS = "journey_progress";
     private static final String KEY_MISSION_POINTS = "mission_points";
     private static final String KEY_COMPLETED_MISSIONS = "completed_missions";
@@ -33,17 +34,48 @@ public class SharedPrefsManager {
 
     // Love Level Management
     public void setLoveLevel(int level) {
-        editor.putInt(KEY_LOVE_LEVEL, level);
-        editor.putString(KEY_LAST_UPDATE_DATE, getCurrentDate());
+        editor.putInt(KEY_LOVE_LEVEL, Math.max(0, Math.min(100, level)));
+        updateLastBatteryUpdate();
         editor.apply();
     }
 
     public int getLoveLevel() {
-        // Check if we need to decrease love level (daily decay)
-        checkAndUpdateDailyDecay();
+        // Check if we need to decrease love level (background decay)
+        checkAndUpdateBackgroundDecay();
         return sharedPreferences.getInt(KEY_LOVE_LEVEL, 75); // Default 75%
     }
+    
+    public void chargeBattery() {
+        int currentLevel = sharedPreferences.getInt(KEY_LOVE_LEVEL, 75);
+        int newLevel = Math.min(100, currentLevel + 2); // Increase by 2%
+        setLoveLevel(newLevel);
+    }
+    
+    private void updateLastBatteryUpdate() {
+        editor.putLong(KEY_LAST_BATTERY_UPDATE, System.currentTimeMillis());
+    }
 
+    private void checkAndUpdateBackgroundDecay() {
+        long lastUpdate = sharedPreferences.getLong(KEY_LAST_BATTERY_UPDATE, System.currentTimeMillis());
+        long currentTime = System.currentTimeMillis();
+        long timeDiff = currentTime - lastUpdate;
+        
+        // Calculate how many 10-second intervals have passed
+        long intervals = timeDiff / (10 * 1000); // 10 seconds = 10000 ms
+        
+        if (intervals > 0) {
+            // Decrease 1% for each 10-second interval that passed
+            int currentLevel = sharedPreferences.getInt(KEY_LOVE_LEVEL, 75);
+            int decreaseAmount = (int) Math.min(intervals, currentLevel); // Don't go below 0
+            int newLevel = Math.max(0, currentLevel - decreaseAmount);
+            
+            // Update the level and timestamp
+            editor.putInt(KEY_LOVE_LEVEL, newLevel);
+            updateLastBatteryUpdate();
+            editor.apply();
+        }
+    }
+    
     private void checkAndUpdateDailyDecay() {
         String lastUpdateDate = sharedPreferences.getString(KEY_LAST_UPDATE_DATE, "");
         String currentDate = getCurrentDate();

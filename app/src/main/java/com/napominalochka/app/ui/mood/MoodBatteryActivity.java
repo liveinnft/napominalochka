@@ -47,28 +47,8 @@ public class MoodBatteryActivity extends AppCompatActivity {
     private void setupBatteryLevel() {
         int currentLevel = prefsManager.getLoveLevel();
         updateBatteryDisplay(currentLevel);
-        startBatteryDecay();
+        // Battery now decays in background automatically
     }
-    
-    private void startBatteryDecay() {
-        // Start continuous decay every 5 seconds
-        batteryProgressBar.postDelayed(decayRunnable, 5000);
-    }
-    
-    private final Runnable decayRunnable = new Runnable() {
-        @Override
-        public void run() {
-            int currentLevel = prefsManager.getLoveLevel();
-            if (currentLevel > 0) {
-                int newLevel = Math.max(0, currentLevel - 1); // Decrease by 1% every 5 seconds
-                prefsManager.setLoveLevel(newLevel);
-                updateBatteryDisplay(newLevel);
-                
-                // Schedule next decay
-                batteryProgressBar.postDelayed(this, 5000);
-            }
-        }
-    };
 
     private void updateBatteryDisplay(int level) {
         // Animate progress bar
@@ -108,15 +88,9 @@ public class MoodBatteryActivity extends AppCompatActivity {
             // Show random love message
             showLoveMessage();
             
-            // Increase love level with limit
-            int currentLevel = prefsManager.getLoveLevel();
-            int increase = new Random().nextInt(20) + 10;
-            int newLevel = Math.min(100, currentLevel + increase);
-            
-            // Only update if actually increased
-            if (newLevel > currentLevel) {
-                prefsManager.setLoveLevel(newLevel);
-                updateBatteryDisplay(newLevel);
+            // Charge battery by 2%
+            prefsManager.chargeBattery();
+            updateBatteryDisplay(prefsManager.getLoveLevel());
                 
                 // Add cooldown to prevent spam (2 seconds)
                 chargeButton.setEnabled(false);
@@ -147,11 +121,16 @@ public class MoodBatteryActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // Update display when returning to activity (battery may have decayed)
+        int currentLevel = prefsManager.getLoveLevel();
+        updateBatteryDisplay(currentLevel);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Stop the decay runnable to prevent memory leaks
-        if (batteryProgressBar != null) {
-            batteryProgressBar.removeCallbacks(decayRunnable);
-        }
+        // Background decay continues automatically via SharedPreferences
     }
 }

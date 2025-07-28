@@ -57,7 +57,7 @@
                     android:textColor="@color/text_secondary"
                     android:layout_marginBottom="24dp" />
 
-                <com.napominalochka.app.ui.stats.RelationshipStatsActivity$CircularDiagram
+                <com.napominalochka.app.ui.stats.CircularDiagram
                     android:id="@+id/relationship_diagram"
                     android:layout_width="200dp"
                     android:layout_height="200dp" />
@@ -101,7 +101,7 @@
                     android:textColor="@color/text_secondary"
                     android:layout_marginBottom="24dp" />
 
-                <com.napominalochka.app.ui.stats.RelationshipStatsActivity$CircularDiagram
+                <com.napominalochka.app.ui.stats.CircularDiagram
                     android:id="@+id/communication_diagram"
                     android:layout_width="200dp"
                     android:layout_height="200dp" />

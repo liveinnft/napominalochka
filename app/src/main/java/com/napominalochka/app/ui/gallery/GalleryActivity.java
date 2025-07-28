@@ -253,6 +253,7 @@ public class GalleryActivity extends AppCompatActivity {
         MediaPlayer mediaPlayer = new MediaPlayer();
         final boolean[] isPlaying = {false};
         final boolean[] isPrepared = {false};
+        final boolean[] isReleased = {false};
         
         SurfaceHolder holder = surfaceView.getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -327,39 +328,52 @@ public class GalleryActivity extends AppCompatActivity {
             
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                if (mediaPlayer != null) {
-                    if (mediaPlayer.isPlaying()) {
-                        mediaPlayer.stop();
-                    }
-                    mediaPlayer.release();
-                }
+                releaseMediaPlayer(mediaPlayer, isReleased);
             }
         });
         
         // Play/Pause button logic
         playPauseButton.setOnClickListener(v -> {
-            if (isPrepared[0] && mediaPlayer != null) {
-                if (isPlaying[0]) {
-                    mediaPlayer.pause();
-                    isPlaying[0] = false;
-                    playPauseButton.setText("▶️ Играть");
-                } else {
-                    mediaPlayer.start();
-                    isPlaying[0] = true;
-                    playPauseButton.setText("⏸️ Пауза");
+            if (isPrepared[0] && mediaPlayer != null && !isReleased[0]) {
+                try {
+                    if (isPlaying[0]) {
+                        mediaPlayer.pause();
+                        isPlaying[0] = false;
+                        playPauseButton.setText("▶️ Играть");
+                    } else {
+                        mediaPlayer.start();
+                        isPlaying[0] = true;
+                        playPauseButton.setText("⏸️ Пауза");
+                    }
+                } catch (IllegalStateException e) {
+                    // MediaPlayer was released, ignore
+                    playPauseButton.setEnabled(false);
                 }
             }
         });
         
         // Cleanup on dialog dismiss
         dialog.setOnDismissListener(d -> {
-            if (mediaPlayer != null) {
+            releaseMediaPlayer(mediaPlayer, isReleased);
+        });
+    }
+    
+    private void releaseMediaPlayer(MediaPlayer mediaPlayer, boolean[] isReleased) {
+        if (mediaPlayer != null && !isReleased[0]) {
+            try {
                 if (mediaPlayer.isPlaying()) {
                     mediaPlayer.stop();
                 }
-                mediaPlayer.release();
+            } catch (IllegalStateException e) {
+                // MediaPlayer already in invalid state, ignore
             }
-        });
+            try {
+                mediaPlayer.release();
+                isReleased[0] = true;
+            } catch (IllegalStateException e) {
+                // MediaPlayer already released, ignore
+            }
+        }
     }
     
     private void adjustSurfaceViewSize(SurfaceView surfaceView, int videoWidth, int videoHeight) {

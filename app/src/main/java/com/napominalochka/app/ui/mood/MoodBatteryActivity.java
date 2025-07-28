@@ -47,8 +47,29 @@ public class MoodBatteryActivity extends AppCompatActivity {
     private void setupBatteryLevel() {
         int currentLevel = prefsManager.getLoveLevel();
         updateBatteryDisplay(currentLevel);
-        // Battery now decays in background automatically
+        // Start active decay while app is open
+        startActiveBatteryDecay();
     }
+    
+    private void startActiveBatteryDecay() {
+        // Active decay every 10 seconds while app is open
+        batteryProgressBar.postDelayed(activeDecayRunnable, 10000);
+    }
+    
+    private final Runnable activeDecayRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int currentLevel = prefsManager.getLoveLevel();
+            if (currentLevel > 0) {
+                int newLevel = Math.max(0, currentLevel - 1); // Decrease by 1% every 10 seconds
+                prefsManager.setLoveLevel(newLevel);
+                updateBatteryDisplay(newLevel);
+                
+                // Schedule next decay
+                batteryProgressBar.postDelayed(this, 10000);
+            }
+        }
+    };
 
     private void updateBatteryDisplay(int level) {
         // Animate progress bar
@@ -84,9 +105,6 @@ public class MoodBatteryActivity extends AppCompatActivity {
             
             // Add charge animation
             animateChargeButton();
-            
-            // Show random love message
-            showLoveMessage();
             
             // Charge battery by 2%
             prefsManager.chargeBattery();
@@ -125,11 +143,25 @@ public class MoodBatteryActivity extends AppCompatActivity {
         // Update display when returning to activity (battery may have decayed)
         int currentLevel = prefsManager.getLoveLevel();
         updateBatteryDisplay(currentLevel);
+        // Restart active decay
+        startActiveBatteryDecay();
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Stop active decay when app is paused
+        if (batteryProgressBar != null) {
+            batteryProgressBar.removeCallbacks(activeDecayRunnable);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Background decay continues automatically via SharedPreferences
+        // Stop active decay and let background decay take over
+        if (batteryProgressBar != null) {
+            batteryProgressBar.removeCallbacks(activeDecayRunnable);
+        }
     }
 }

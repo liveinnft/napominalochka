@@ -93,30 +93,86 @@ public class CircularDiagram extends View {
     }
 
     private void drawMonthMarkers(Canvas canvas, int centerX, int centerY, int radius) {
-        // Draw month markers (every 30 days approximately)
+        // Draw ALL month markers (past and future)
         for (int month = 1; month <= 12; month++) {
             int monthDays = month * 30; // Approximate
+            float angle = (float) (360.0 * monthDays / yearDays - 90);
+            double radians = Math.toRadians(angle);
+            
+            // Choose color based on whether month is reached
+            Paint monthMarkerPaint = new Paint(markerPaint);
+            Paint monthTextPaint = new Paint(textPaint);
+            monthTextPaint.setTextSize(16);
+            
             if (monthDays <= days) {
-                float angle = (float) (360.0 * monthDays / yearDays - 90);
-                double radians = Math.toRadians(angle);
-                
-                float startX = (float) (centerX + (radius - 15) * Math.cos(radians));
-                float startY = (float) (centerY + (radius - 15) * Math.sin(radians));
-                float endX = (float) (centerX + (radius + 15) * Math.cos(radians));
-                float endY = (float) (centerY + (radius + 15) * Math.sin(radians));
-                
-                canvas.drawLine(startX, startY, endX, endY, markerPaint);
-                
-                // Draw month number
-                float textX = (float) (centerX + (radius + 35) * Math.cos(radians));
-                float textY = (float) (centerY + (radius + 35) * Math.sin(radians));
-                
-                Paint monthTextPaint = new Paint(textPaint);
-                monthTextPaint.setTextSize(16);
+                // Past/current months - bright color
+                monthMarkerPaint.setColor(Color.parseColor("#C17B5C"));
                 monthTextPaint.setColor(Color.parseColor("#C17B5C"));
-                canvas.drawText(month + "м", textX, textY, monthTextPaint);
+            } else {
+                // Future months - light gray
+                monthMarkerPaint.setColor(Color.parseColor("#D0D0D0"));
+                monthTextPaint.setColor(Color.parseColor("#B0B0B0"));
             }
+            
+            float startX = (float) (centerX + (radius - 15) * Math.cos(radians));
+            float startY = (float) (centerY + (radius - 15) * Math.sin(radians));
+            float endX = (float) (centerX + (radius + 15) * Math.cos(radians));
+            float endY = (float) (centerY + (radius + 15) * Math.sin(radians));
+            
+            canvas.drawLine(startX, startY, endX, endY, monthMarkerPaint);
+            
+            // Draw month number
+            float textX = (float) (centerX + (radius + 35) * Math.cos(radians));
+            float textY = (float) (centerY + (radius + 35) * Math.sin(radians));
+            canvas.drawText(month + "м", textX, textY, monthTextPaint);
         }
+        
+        // Draw birthday markers
+        drawBirthdayMarkers(canvas, centerX, centerY, radius);
+    }
+    
+    private void drawBirthdayMarkers(Canvas canvas, int centerX, int centerY, int radius) {
+        // Boy's birthday: April 3 (day 93 approximately)
+        int boyBirthdayDay = 31 + 29 + 31 + 3; // Jan + Feb + Mar + 3 days = 94
+        drawBirthdayMarker(canvas, centerX, centerY, radius, boyBirthdayDay, "👦", Color.parseColor("#4A90E2"));
+        
+        // Girl's birthday: May 6 (day 126 approximately) 
+        int girlBirthdayDay = 31 + 29 + 31 + 30 + 6; // Jan + Feb + Mar + Apr + 6 days = 127
+        drawBirthdayMarker(canvas, centerX, centerY, radius, girlBirthdayDay, "👧", Color.parseColor("#E24A90"));
+    }
+    
+    private void drawBirthdayMarker(Canvas canvas, int centerX, int centerY, int radius, int dayOfYear, String emoji, int color) {
+        float angle = (float) (360.0 * dayOfYear / yearDays - 90);
+        double radians = Math.toRadians(angle);
+        
+        // Draw heart marker
+        Paint birthdayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        birthdayPaint.setColor(color);
+        birthdayPaint.setStrokeWidth(8);
+        
+        float markerX = (float) (centerX + radius * Math.cos(radians));
+        float markerY = (float) (centerY + radius * Math.sin(radians));
+        
+        // Draw heart shape (simplified as circle with heart emoji)
+        canvas.drawCircle(markerX, markerY, 12, birthdayPaint);
+        
+        // Draw emoji
+        Paint emojiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        emojiPaint.setTextSize(20);
+        emojiPaint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(emoji, markerX, markerY + 7, emojiPaint);
+        
+        // Draw date label outside
+        Paint datePaint = new Paint(textPaint);
+        datePaint.setTextSize(12);
+        datePaint.setColor(color);
+        datePaint.setTextAlign(Paint.Align.CENTER);
+        
+        float labelX = (float) (centerX + (radius + 50) * Math.cos(radians));
+        float labelY = (float) (centerY + (radius + 50) * Math.sin(radians));
+        
+        String dateLabel = emoji.equals("👦") ? "3 апр" : "6 мая";
+        canvas.drawText(dateLabel, labelX, labelY, datePaint);
     }
 
     @Override

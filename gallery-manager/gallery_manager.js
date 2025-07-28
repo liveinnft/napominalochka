@@ -154,22 +154,29 @@ function addGalleryItem() {
     
     currentFiles.forEach(file => {
         const fileExtension = file.name.split('.').pop().toLowerCase();
-        const timestamp = Date.now();
-        const uniqueFileName = `file_${timestamp}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-        
         const type = file.type.startsWith('image/') ? 'photo' : 'video';
-        const baseFileName = uniqueFileName.replace(/\.[^/.]+$/, ""); // Убираем расширение для видео
+        
+        // Автоматическое переименование под нужный формат для Android приложения
+        let androidFileName;
+        if (type === 'photo') {
+            const photoCount = galleryItems.filter(item => item.type === 'photo').length + 1;
+            androidFileName = `photo${photoCount}.${fileExtension}`;
+        } else {
+            const videoCount = galleryItems.filter(item => item.type === 'video').length + 1;
+            androidFileName = `video${videoCount}`; // Без расширения для видео в Android
+        }
         
         const galleryItem = {
             type: type,
-            fileName: type === 'photo' ? uniqueFileName : baseFileName,
+            fileName: androidFileName,
             title: title,
             description: description,
-            originalFile: file
+            originalFile: file,
+            originalFileName: file.name
         };
         
         galleryItems.push(galleryItem);
-        mediaFiles.set(uniqueFileName, file);
+        mediaFiles.set(androidFileName, file);
     });
     
     // Очистка формы
@@ -211,7 +218,8 @@ function updateGalleryDisplay() {
                 ${item.type === 'photo' ? '📷 Фото' : '🎬 Видео'}
             </div>
             <h4>${item.title}</h4>
-            <p><strong>Файл:</strong> ${item.fileName}</p>
+            <p><strong>Исходный файл:</strong> ${item.originalFileName || item.fileName}</p>
+            <p><strong>Имя в приложении:</strong> <code>${item.fileName}</code></p>
             <p><strong>Описание:</strong> ${item.description}</p>
             <button class="btn btn-danger" onclick="removeGalleryItem(${index})">🗑️ Удалить</button>
         `;
@@ -226,10 +234,46 @@ function removeGalleryItem(index) {
         const item = galleryItems[index];
         mediaFiles.delete(item.fileName);
         galleryItems.splice(index, 1);
+        
+        // Перенумеровать оставшиеся файлы
+        renumberGalleryItems();
+        
         updateGalleryDisplay();
         updateStatistics();
         saveData();
     }
+}
+
+// Перенумерация файлов после удаления
+function renumberGalleryItems() {
+    const newMediaFiles = new Map();
+    let photoCounter = 1;
+    let videoCounter = 1;
+    
+    galleryItems.forEach(item => {
+        const oldFileName = item.fileName;
+        const oldFile = mediaFiles.get(oldFileName);
+        
+        if (item.type === 'photo') {
+            const fileExtension = item.originalFileName ? 
+                item.originalFileName.split('.').pop().toLowerCase() : 
+                oldFileName.split('.').pop().toLowerCase();
+            item.fileName = `photo${photoCounter}.${fileExtension}`;
+            photoCounter++;
+        } else {
+            item.fileName = `video${videoCounter}`;
+            videoCounter++;
+        }
+        
+        if (oldFile) {
+            newMediaFiles.set(item.fileName, oldFile);
+        }
+    });
+    
+    mediaFiles.clear();
+    newMediaFiles.forEach((value, key) => {
+        mediaFiles.set(key, value);
+    });
 }
 
 // Обновление статистики
@@ -590,11 +634,20 @@ async function exportMediaFiles() {
         const photosFolder = zip.folder("photos");
         const videosFolder = zip.folder("videos");
         
-        // Добавляем файлы в соответствующие папки
-        for (const [fileName, file] of mediaFiles.entries()) {
+        // Добавляем файлы в соответствующие папки с правильными именами
+        for (const [androidFileName, file] of mediaFiles.entries()) {
             const isPhoto = file.type.startsWith('image/');
             const folder = isPhoto ? photosFolder : videosFolder;
-            folder.file(fileName, file);
+            
+            // Для фото сохраняем с расширением, для видео - без расширения (как в Android)
+            let finalFileName = androidFileName;
+            if (!isPhoto && !androidFileName.includes('.')) {
+                // Для видео добавляем исходное расширение при сохранении в архив
+                const originalExtension = file.name.split('.').pop().toLowerCase();
+                finalFileName = `${androidFileName}.${originalExtension}`;
+            }
+            
+            folder.file(finalFileName, file);
         }
         
         // Создаем архив
@@ -622,10 +675,19 @@ async function exportAll() {
             const photosFolder = zip.folder("media/photos");
             const videosFolder = zip.folder("media/videos");
             
-            for (const [fileName, file] of mediaFiles.entries()) {
+            for (const [androidFileName, file] of mediaFiles.entries()) {
                 const isPhoto = file.type.startsWith('image/');
                 const folder = isPhoto ? photosFolder : videosFolder;
-                folder.file(fileName, file);
+                
+                // Для фото сохраняем с расширением, для видео - без расширения (как в Android)
+                let finalFileName = androidFileName;
+                if (!isPhoto && !androidFileName.includes('.')) {
+                    // Для видео добавляем исходное расширение при сохранении в архив
+                    const originalExtension = file.name.split('.').pop().toLowerCase();
+                    finalFileName = `${androidFileName}.${originalExtension}`;
+                }
+                
+                folder.file(finalFileName, file);
             }
         }
         

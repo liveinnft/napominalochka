@@ -59,7 +59,228 @@
     <div class="small" style="margin-top:16px;">Все данные сохраняются в браузере (LocalStorage) и не теряются при закрытии страницы.</div>
   </div>
   <script>
-// ... JS будет добавлен на следующем шаге ...
+// ========== ПЕРЕМЕННЫЕ ===========
+const LS_KEY = 'napominalochka_editor_data_v1';
+let state = {
+  battery: 100,
+  batteryLastUpdate: Date.now(),
+  secretCode: '',
+  secretMessage: '',
+  loveMessages: [],
+  jokes: [],
+  facts: [],
+  missions: [],
+  journeyContent: [],
+  media: [] // {type, file, name, title, desc, url}
+};
+let batteryTimer = null;
+let chargeCooldown = false;
+
+// ========== ЗАГРУЗКА/СОХРАНЕНИЕ ===========
+function saveState() {
+  const toSave = {...state};
+  toSave.media = toSave.media.map(m => ({...m, file: undefined, url: m.url})); // не сохраняем file-объекты
+  localStorage.setItem(LS_KEY, JSON.stringify(toSave));
+}
+function loadState() {
+  const raw = localStorage.getItem(LS_KEY);
+  if (!raw) return;
+  try {
+    const loaded = JSON.parse(raw);
+    Object.assign(state, loaded);
+    // media url восстановить
+    if (Array.isArray(loaded.media)) {
+      state.media = loaded.media.map(m => ({...m, file: undefined, url: m.url}));
+    }
+  } catch(e) { console.error('Ошибка загрузки state', e); }
+}
+
+// ========== UI ОБНОВЛЕНИЕ ===========
+function updateUI() {
+  document.getElementById('secretCode').value = state.secretCode;
+  document.getElementById('secretMessage').value = state.secretMessage;
+  document.getElementById('loveMessages').value = state.loveMessages.join('\n');
+  document.getElementById('jokes').value = state.jokes.join('\n');
+  document.getElementById('facts').value = state.facts.join('\n');
+  document.getElementById('missions').value = state.missions.map(m => m.join('|')).join('\n');
+  document.getElementById('journeyContent').value = state.journeyContent.map(j => j.join('|')).join('\n');
+  updateMediaList();
+  updateBattery();
+}
+
+// ========== ОБРАБОТЧИКИ ИНПУТОВ ===========
+function setupInputs() {
+  document.getElementById('secretCode').oninput = e => { state.secretCode = e.target.value; saveState(); };
+  document.getElementById('secretMessage').oninput = e => { state.secretMessage = e.target.value; saveState(); };
+  document.getElementById('loveMessages').oninput = e => {
+    state.loveMessages = e.target.value.split(/\n/).map(s=>s.trim()).filter(Boolean); saveState(); };
+  document.getElementById('jokes').oninput = e => {
+    state.jokes = e.target.value.split(/\n/).map(s=>s.trim()).filter(Boolean); saveState(); };
+  document.getElementById('facts').oninput = e => {
+    state.facts = e.target.value.split(/\n/).map(s=>s.trim()).filter(Boolean); saveState(); };
+  document.getElementById('missions').oninput = e => {
+    state.missions = e.target.value.split(/\n/).map(s=>s.split('|').map(x=>x.trim())).filter(arr=>arr.length===2); saveState(); };
+  document.getElementById('journeyContent').oninput = e => {
+    state.journeyContent = e.target.value.split(/\n/).map(s=>s.split('|').map(x=>x.trim())).filter(arr=>arr.length===2); saveState(); };
+}
+
+// ========== МЕДИА ===========
+function updateMediaList() {
+  const list = document.getElementById('mediaList');
+  list.innerHTML = '';
+  state.media.forEach((m, idx) => {
+    const div = document.createElement('div');
+    div.className = 'media-item';
+    let preview = '';
+    if (m.type === 'photo') preview = `<img src="${m.url}" alt="img">`;
+    else preview = `<video src="${m.url}" controls height="80"></video>`;
+    div.innerHTML = preview +
+      `<input type="text" placeholder="Заголовок" value="${m.title||''}" onchange="window._mediaTitle(${idx}, this.value)">`+
+      `<textarea rows="2" placeholder="Описание" onchange="window._mediaDesc(${idx}, this.value)">${m.desc||''}</textarea>`+
+      `<button onclick="window._mediaDelete(${idx})">Удалить</button>`;
+    list.appendChild(div);
+  });
+}
+window._mediaTitle = (idx, val) => { state.media[idx].title = val; saveState(); };
+window._mediaDesc = (idx, val) => { state.media[idx].desc = val; saveState(); };
+window._mediaDelete = idx => { state.media.splice(idx,1); saveState(); updateMediaList(); };
+
+document.getElementById('mediaInput').onchange = async function(e) {
+  const files = Array.from(e.target.files);
+  for (const file of files) {
+    const type = file.type.startsWith('image') ? 'photo' : 'video';
+    const url = URL.createObjectURL(file);
+    state.media.push({type, file, name: '', title: '', desc: '', url});
+  }
+  saveState();
+  updateMediaList();
+  e.target.value = '';
+};
+
+// ========== БАТАРЕЙКА ===========
+function updateBattery() {
+  let percent = Math.max(0, Math.min(100, Math.round(state.battery)));
+  document.getElementById('batteryLevel').style.width = percent + '%';
+  document.getElementById('batteryPercent').textContent = percent + '%';
+}
+function batteryTick() {
+  const now = Date.now();
+  let diff = Math.floor((now - state.batteryLastUpdate)/10000); // 10 сек
+  if (diff > 0) {
+    state.battery = Math.max(0, state.battery - diff);
+    state.batteryLastUpdate += diff*10000;
+    saveState();
+    updateBattery();
+  }
+}
+function startBatteryTimer() {
+  if (batteryTimer) clearInterval(batteryTimer);
+  batteryTimer = setInterval(batteryTick, 2000);
+}
+document.getElementById('chargeBtn').onclick = function() {
+  if (chargeCooldown) return;
+  state.battery = Math.min(100, state.battery + 2);
+  state.batteryLastUpdate = Date.now();
+  saveState();
+  updateBattery();
+  chargeCooldown = true;
+  document.getElementById('chargeBtn').disabled = true;
+  setTimeout(()=>{
+    chargeCooldown = false;
+    document.getElementById('chargeBtn').disabled = false;
+  }, 2000);
+};
+
+// ========== ЭКСПОРТ ===========
+function escapeJavaString(str) {
+  return str.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
+}
+function exportAppTexts() {
+  let out = 'package com.napominalochka.app.config;\n\npublic class AppTexts {\n';
+  out += `    public static final String SECRET_CODE = "${escapeJavaString(state.secretCode)}";\n`;
+  out += `    public static final String[] LOVE_MESSAGES = {\n`;
+  out += state.loveMessages.map(s=>`        "${escapeJavaString(s)}"`).join(',\n')+'\n    };\n';
+  out += `    public static final String[][] MISSIONS = {\n`;
+  out += state.missions.map(m=>`        {"${escapeJavaString(m[0])}", "${escapeJavaString(m[1])}"}`).join(',\n')+'\n    };\n';
+  out += `    public static final String[][] JOURNEY_CONTENT = {\n`;
+  out += state.journeyContent.map(j=>`        {"${escapeJavaString(j[0])}", "${escapeJavaString(j[1])}"}`).join(',\n')+'\n    };\n';
+  out += `    public static final String[] JOKES = {\n`;
+  out += state.jokes.map(s=>`        "${escapeJavaString(s)}"`).join(',\n')+'\n    };\n';
+  out += `    public static final String[] FACTS = {\n`;
+  out += state.facts.map(s=>`        "${escapeJavaString(s)}"`).join(',\n')+'\n    };\n';
+  out += `    public static final String SECRET_MESSAGE = \n        "${escapeJavaString(state.secretMessage)}";\n`;
+  out += '}\n';
+  downloadTextFile('AppTexts.java', out);
+}
+function exportGalleryConfig() {
+  let out = 'package com.napominalochka.app.config;\n\npublic class GalleryConfig {\n';
+  out += '    public static final String[][] GALLERY_ITEMS = {\n';
+  let idxPhoto = 1, idxVideo = 1;
+  out += state.media.map(m => {
+    let fname = '';
+    if (m.type === 'photo') fname = `photo${idxPhoto++}.jpg`;
+    else fname = `video${idxVideo++}`;
+    return `        {"${m.type}", "${fname}", "${escapeJavaString(m.title||'')}", "${escapeJavaString(m.desc||'')}"}`;
+  }).join(',\n')+'\n    };\n';
+  out += '}\n';
+  downloadTextFile('GalleryConfig.java', out);
+}
+function downloadTextFile(filename, text) {
+  const blob = new Blob([text], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ========== СКАЧАТЬ МЕДИА ===========
+document.getElementById('downloadMedia').onclick = async function() {
+  const zip = await createZip();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(zip);
+  a.download = 'media.zip';
+  a.click();
+};
+async function createZip() {
+  // Используем JSZip через CDN
+  if (!window.JSZip) {
+    await new Promise(r => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+      s.onload = r;
+      document.body.appendChild(s);
+    });
+  }
+  const zip = new JSZip();
+  let idxPhoto = 1, idxVideo = 1;
+  for (const m of state.media) {
+    let fname = '';
+    if (m.type === 'photo') fname = `photo${idxPhoto++}.jpg`;
+    else fname = `video${idxVideo++}`;
+    const res = await fetch(m.url);
+    const blob = await res.blob();
+    zip.file(fname, blob);
+  }
+  return zip.generateAsync({type:'blob'});
+}
+
+// ========== КНОПКИ ===========
+document.getElementById('exportAppTexts').onclick = exportAppTexts;
+document.getElementById('exportGalleryConfig').onclick = exportGalleryConfig;
+document.getElementById('clearAll').onclick = function() {
+  if (confirm('Очистить все данные?')) {
+    localStorage.removeItem(LS_KEY);
+    location.reload();
+  }
+};
+
+// ========== ИНИЦИАЛИЗАЦИЯ ===========
+loadState();
+setupInputs();
+updateUI();
+startBatteryTimer();
+setInterval(updateUI, 2000); // обновлять UI периодически
+
   </script>
 </body>
 </html>

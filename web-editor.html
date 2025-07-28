@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Napominalochka Content Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; background: #f7f7fa; margin: 0; padding: 0; }
+    .container { max-width: 900px; margin: 30px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 24px; }
+    h1, h2 { color: #4a3c6e; }
+    textarea, input, select { width: 100%; margin: 4px 0 12px 0; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+    .section { margin-bottom: 32px; }
+    .media-list { display: flex; flex-wrap: wrap; gap: 12px; }
+    .media-item { background: #f0f0f7; border-radius: 6px; padding: 8px; width: 180px; }
+    .media-item img, .media-item video { max-width: 100%; border-radius: 4px; }
+    .battery { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .battery-bar { width: 120px; height: 24px; background: #eee; border-radius: 12px; overflow: hidden; border: 1px solid #bbb; }
+    .battery-level { height: 100%; background: linear-gradient(90deg, #ffb6c1, #b39ddb); transition: width 0.3s; }
+    .btn { background: #6c63ff; color: #fff; border: none; border-radius: 4px; padding: 8px 16px; cursor: pointer; margin-right: 8px; }
+    .btn:disabled { background: #aaa; }
+    .export-group { margin-top: 24px; }
+    .small { font-size: 0.9em; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Napominalochka Content Editor</h1>
+    <div class="section">
+      <h2>Батарейка настроения</h2>
+      <div class="battery">
+        <div class="battery-bar"><div id="batteryLevel" class="battery-level"></div></div>
+        <span id="batteryPercent">100%</span>
+        <button class="btn" id="chargeBtn">Зарядить +2%</button>
+      </div>
+      <div class="small">Батарейка разряжается на 1% каждые 10 секунд. Зарядка +2% по кнопке.</div>
+    </div>
+    <div class="section">
+      <h2>Фразы (AppTexts)</h2>
+      <label>SECRET_CODE:<input id="secretCode" type="text"></label>
+      <label>SECRET_MESSAGE:<textarea id="secretMessage" rows="3"></textarea></label>
+      <label>LOVE_MESSAGES (по одному в строке):<textarea id="loveMessages" rows="6"></textarea></label>
+      <label>JOKES (по одному в строке):<textarea id="jokes" rows="4"></textarea></label>
+      <label>FACTS (по одному в строке):<textarea id="facts" rows="4"></textarea></label>
+      <label>MISSIONS (формат: название|описание, по одному в строке):<textarea id="missions" rows="8"></textarea></label>
+      <label>JOURNEY_CONTENT (формат: заголовок|содержание, по одному в строке):<textarea id="journeyContent" rows="8"></textarea></label>
+    </div>
+    <div class="section">
+      <h2>Галерея (GalleryConfig)</h2>
+      <input type="file" id="mediaInput" multiple accept="image/*,video/*">
+      <div class="small">Загружайте фото и видео. После загрузки добавьте заголовок и описание к каждому.</div>
+      <div id="mediaList" class="media-list"></div>
+    </div>
+    <div class="export-group">
+      <button class="btn" id="exportAppTexts">Экспорт AppTexts.java</button>
+      <button class="btn" id="exportGalleryConfig">Экспорт GalleryConfig.java</button>
+      <button class="btn" id="downloadMedia">Скачать все медиа (zip)</button>
+      <button class="btn" id="clearAll">Очистить всё</button>
+    </div>
+    <div class="small" style="margin-top:16px;">Все данные сохраняются в браузере (LocalStorage) и не теряются при закрытии страницы.</div>
+  </div>
+  <script>
+// ... JS будет добавлен на следующем шаге ...
+  </script>
+</body>
+</html>

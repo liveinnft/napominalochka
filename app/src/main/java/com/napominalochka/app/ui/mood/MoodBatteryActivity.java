@@ -92,10 +92,9 @@ public class MoodBatteryActivity extends AppCompatActivity {
             prefsManager.chargeBattery();
             updateBatteryDisplay(prefsManager.getLoveLevel());
                 
-                // Add cooldown to prevent spam (2 seconds)
-                chargeButton.setEnabled(false);
-                chargeButton.postDelayed(() -> chargeButton.setEnabled(true), 2000);
-            }
+            // Add cooldown to prevent spam (2 seconds)
+            chargeButton.setEnabled(false);
+            chargeButton.postDelayed(() -> chargeButton.setEnabled(true), 2000);
         });
     }
 

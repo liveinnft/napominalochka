@@ -1,25 +1,25 @@
 package com.napominalochka.app.ui.stats;
 
-import android.animation.ValueAnimator;
-import android.app.AlertDialog;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.napominalochka.app.R;
 import com.napominalochka.app.utils.SharedPrefsManager;
-import java.util.Random;
 
 public class RelationshipStatsActivity extends AppCompatActivity {
     
-    private TextView daysTogetherText, communicationText;
-    private TextView romanceLevelText, achievementsText;
-    private ProgressBar romanceProgressBar;
-    
     private SharedPrefsManager prefsManager;
+    private TextView relationshipTitleText, relationshipDaysText;
+    private TextView communicationTitleText, communicationDaysText;
+    private CircularDiagram relationshipDiagram, communicationDiagram;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class RelationshipStatsActivity extends AppCompatActivity {
         prefsManager = new SharedPrefsManager(this);
         
         initViews();
-        updateAllStats();
+        updateStatistics();
         
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -38,74 +38,147 @@ public class RelationshipStatsActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        daysTogetherText = findViewById(R.id.days_together_text);
-        communicationText = findViewById(R.id.messages_text); // Переиспользуем для дней общения
-        romanceLevelText = findViewById(R.id.romance_level_text);
-        achievementsText = findViewById(R.id.achievements_text);
-        romanceProgressBar = findViewById(R.id.romance_progress_bar);
+        relationshipTitleText = findViewById(R.id.relationship_title);
+        relationshipDaysText = findViewById(R.id.relationship_days);
+        relationshipDiagram = findViewById(R.id.relationship_diagram);
+        
+        communicationTitleText = findViewById(R.id.communication_title);
+        communicationDaysText = findViewById(R.id.communication_days);
+        communicationDiagram = findViewById(R.id.communication_diagram);
     }
 
-    private void updateAllStats() {
-        // Days together (relationship)
-        int daysTogether = prefsManager.getDaysTogether();
-        daysTogetherText.setText(daysTogether + " дней в отношениях 💕");
+    private void updateStatistics() {
+        // Relationship stats
+        int relationshipDays = prefsManager.getDaysTogether();
+        relationshipTitleText.setText("💕 Дней в отношениях");
+        relationshipDaysText.setText(relationshipDays + " дней");
+        relationshipDiagram.setDays(relationshipDays, "relationship");
         
-        // Days communicating
-        int daysCommunicating = prefsManager.getDaysCommunicating();
-        communicationText.setText(daysCommunicating + " дней общения 💬");
-        
-        // Romance level (random daily)
-        int romanceLevel = getDailyRomanceLevel();
-        romanceLevelText.setText(romanceLevel + "%");
-        animateProgressBar(romanceLevel);
-        
-        // Achievements based on days
-        updateAchievements(daysTogether, daysCommunicating);
+        // Communication stats  
+        int communicationDays = prefsManager.getDaysCommunicating();
+        communicationTitleText.setText("💬 Дней общения");
+        communicationDaysText.setText(communicationDays + " дней");
+        communicationDiagram.setDays(communicationDays, "communication");
     }
-
-    private void animateProgressBar(int targetProgress) {
-        ValueAnimator animator = ValueAnimator.ofInt(0, targetProgress);
-        animator.setDuration(1500);
-        animator.addUpdateListener(animation -> {
-            int progress = (int) animation.getAnimatedValue();
-            romanceProgressBar.setProgress(progress);
-        });
-        animator.start();
-    }
-
-    private int getDailyRomanceLevel() {
-        // Generate consistent daily romance level based on date
-        Random random = new Random(System.currentTimeMillis() / (1000 * 60 * 60 * 24));
-        return 85 + random.nextInt(16); // 85-100%
-    }
-
-    private void updateAchievements(int daysRelationship, int daysCommunication) {
-        StringBuilder achievements = new StringBuilder();
-        
-        // Relationship achievements
-        if (daysRelationship >= 1) achievements.append("💕 Первый день вместе\n");
-        if (daysRelationship >= 7) achievements.append("🌟 Неделя отношений\n");
-        if (daysRelationship >= 30) achievements.append("🎉 Месяц счастья\n");
-        if (daysRelationship >= 100) achievements.append("💎 100 дней вместе\n");
-        if (daysRelationship >= 365) achievements.append("👑 Год любви\n");
-        
-        // Communication achievements  
-        if (daysCommunication >= 30) achievements.append("💬 Месяц общения\n");
-        if (daysCommunication >= 100) achievements.append("📱 100 дней разговоров\n");
-        if (daysCommunication >= 200) achievements.append("🗣️ Болтуны профессионалы\n");
-        
-        if (achievements.length() == 0) {
-            achievements.append("🌱 Только начинаем наше общение!");
-        }
-        
-        achievementsText.setText(achievements.toString().trim());
-    }
-
-
 
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    // Custom circular diagram view
+    public static class CircularDiagram extends View {
+        private Paint backgroundPaint, progressPaint, textPaint, markerPaint;
+        private RectF rectF;
+        private int days = 0;
+        private String type = "";
+        private int yearDays = 365;
+
+        public CircularDiagram(Context context, AttributeSet attrs) {
+            super(context, attrs);
+            init();
+        }
+
+        private void init() {
+            backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            backgroundPaint.setColor(Color.parseColor("#F0E6D2"));
+            backgroundPaint.setStyle(Paint.Style.STROKE);
+            backgroundPaint.setStrokeWidth(20);
+
+            progressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            progressPaint.setColor(Color.parseColor("#D4A574"));
+            progressPaint.setStyle(Paint.Style.STROKE);
+            progressPaint.setStrokeWidth(20);
+            progressPaint.setStrokeCap(Paint.Cap.ROUND);
+
+            textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setColor(Color.parseColor("#3E3427"));
+            textPaint.setTextSize(48);
+            textPaint.setTextAlign(Paint.Align.CENTER);
+
+            markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            markerPaint.setColor(Color.parseColor("#C17B5C"));
+            markerPaint.setStrokeWidth(6);
+
+            rectF = new RectF();
+        }
+
+        public void setDays(int days, String type) {
+            this.days = days;
+            this.type = type;
+            invalidate();
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            int width = getWidth();
+            int height = getHeight();
+            int radius = Math.min(width, height) / 2 - 50;
+            
+            int centerX = width / 2;
+            int centerY = height / 2;
+
+            rectF.set(centerX - radius, centerY - radius, 
+                     centerX + radius, centerY + radius);
+
+            // Draw background circle
+            canvas.drawCircle(centerX, centerY, radius, backgroundPaint);
+
+            // Calculate progress (relative to year)
+            float progress = Math.min(1.0f, (float) days / yearDays);
+            float sweepAngle = 360 * progress;
+
+            // Draw progress arc
+            canvas.drawArc(rectF, -90, sweepAngle, false, progressPaint);
+
+            // Draw month markers
+            drawMonthMarkers(canvas, centerX, centerY, radius);
+
+            // Draw center text
+            String centerText = days + "\nдней";
+            String[] lines = centerText.split("\n");
+            
+            textPaint.setTextSize(36);
+            canvas.drawText(lines[0], centerX, centerY - 10, textPaint);
+            textPaint.setTextSize(24);
+            canvas.drawText(lines[1], centerX, centerY + 25, textPaint);
+        }
+
+        private void drawMonthMarkers(Canvas canvas, int centerX, int centerY, int radius) {
+            // Draw month markers (every 30 days approximately)
+            for (int month = 1; month <= 12; month++) {
+                int monthDays = month * 30; // Approximate
+                if (monthDays <= days) {
+                    float angle = (float) (360.0 * monthDays / yearDays - 90);
+                    double radians = Math.toRadians(angle);
+                    
+                    float startX = (float) (centerX + (radius - 15) * Math.cos(radians));
+                    float startY = (float) (centerY + (radius - 15) * Math.sin(radians));
+                    float endX = (float) (centerX + (radius + 15) * Math.cos(radians));
+                    float endY = (float) (centerY + (radius + 15) * Math.sin(radians));
+                    
+                    canvas.drawLine(startX, startY, endX, endY, markerPaint);
+                    
+                    // Draw month number
+                    float textX = (float) (centerX + (radius + 35) * Math.cos(radians));
+                    float textY = (float) (centerY + (radius + 35) * Math.sin(radians));
+                    
+                    Paint monthTextPaint = new Paint(textPaint);
+                    monthTextPaint.setTextSize(16);
+                    monthTextPaint.setColor(Color.parseColor("#C17B5C"));
+                    canvas.drawText(month + "м", textX, textY, monthTextPaint);
+                }
+            }
+        }
+
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            int size = Math.min(MeasureSpec.getSize(widthMeasureSpec), 
+                               MeasureSpec.getSize(heightMeasureSpec));
+            setMeasuredDimension(size, size);
+        }
     }
 }

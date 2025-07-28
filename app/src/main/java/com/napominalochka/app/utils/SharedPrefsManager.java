@@ -40,8 +40,7 @@ public class SharedPrefsManager {
     }
 
     public int getLoveLevel() {
-        // Check if we need to decrease love level (background decay)
-        checkAndUpdateBackgroundDecay();
+        // No background decay - only active decay when app is open
         return sharedPreferences.getInt(KEY_LOVE_LEVEL, 75); // Default 75%
     }
     

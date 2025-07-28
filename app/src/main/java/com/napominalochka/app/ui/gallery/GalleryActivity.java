@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -272,9 +273,17 @@ public class GalleryActivity extends AppCompatActivity {
                         statusText.setVisibility(View.GONE);
                         playPauseButton.setEnabled(true);
                         
+                        // Adjust SurfaceView size to video aspect ratio
+                        int videoWidth = mp.getVideoWidth();
+                        int videoHeight = mp.getVideoHeight();
+                        if (videoWidth > 0 && videoHeight > 0) {
+                            // Use post to ensure container is properly laid out
+                            surfaceView.post(() -> adjustSurfaceViewSize(surfaceView, videoWidth, videoHeight));
+                        }
+                        
                         // Auto-start video
                         mp.setLooping(true);
-                        mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+                        mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
                         mp.start();
                         isPlaying[0] = true;
                         playPauseButton.setText("⏸️ Пауза");
@@ -351,6 +360,49 @@ public class GalleryActivity extends AppCompatActivity {
                 mediaPlayer.release();
             }
         });
+    }
+    
+    private void adjustSurfaceViewSize(SurfaceView surfaceView, int videoWidth, int videoHeight) {
+        // Get the container size
+        View container = (View) surfaceView.getParent();
+        int containerWidth = container.getWidth();
+        int containerHeight = container.getHeight();
+        
+        if (containerWidth <= 0 || containerHeight <= 0) {
+            // Container not ready yet, use default values
+            containerWidth = 800;
+            containerHeight = 600;
+        }
+        
+        // Calculate aspect ratios
+        float videoAspect = (float) videoWidth / videoHeight;
+        float containerAspect = (float) containerWidth / containerHeight;
+        
+        int newWidth, newHeight;
+        
+        if (videoAspect > containerAspect) {
+            // Video is wider than container - fit by width
+            newWidth = containerWidth;
+            newHeight = (int) (containerWidth / videoAspect);
+        } else {
+            // Video is taller than container - fit by height
+            newHeight = containerHeight;
+            newWidth = (int) (containerHeight * videoAspect);
+        }
+        
+        // Apply new size to SurfaceView
+        ViewGroup.LayoutParams layoutParams = surfaceView.getLayoutParams();
+        layoutParams.width = newWidth;
+        layoutParams.height = newHeight;
+        surfaceView.setLayoutParams(layoutParams);
+        
+        // Log for debugging
+        android.util.Log.d("VideoResize", String.format(
+            "Video: %dx%d (%.2f), Container: %dx%d (%.2f), New: %dx%d", 
+            videoWidth, videoHeight, videoAspect,
+            containerWidth, containerHeight, containerAspect,
+            newWidth, newHeight
+        ));
     }
     
     private void showVideoInfo(String resourceName, int resourceId) {

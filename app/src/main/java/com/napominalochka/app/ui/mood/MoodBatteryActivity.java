@@ -106,9 +106,18 @@ public class MoodBatteryActivity extends AppCompatActivity {
             // Add charge animation
             animateChargeButton();
             
+            // Get current level before charging
+            int currentLevel = prefsManager.getLoveLevel();
+            
             // Charge battery by 2%
             prefsManager.chargeBattery();
-            updateBatteryDisplay(prefsManager.getLoveLevel());
+            int newLevel = prefsManager.getLoveLevel();
+            updateBatteryDisplay(newLevel);
+            
+            // Show love message only when battery reaches 100%
+            if (currentLevel < 100 && newLevel >= 100) {
+                showLoveMessage();
+            }
                 
             // Add cooldown to prevent spam (2 seconds)
             chargeButton.setEnabled(false);
@@ -131,9 +140,9 @@ public class MoodBatteryActivity extends AppCompatActivity {
         String randomMessage = AppTexts.LOVE_MESSAGES[new Random().nextInt(AppTexts.LOVE_MESSAGES.length)];
         
         new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.charge_message_title))
-                .setMessage(randomMessage)
-                .setPositiveButton(getString(R.string.ok), null)
+                .setTitle("💖 Батарейка полностью заряжена!")
+                .setMessage("коть, ты меня до одурения зарядил своей любовью!! 💕\n\n" + randomMessage)
+                .setPositiveButton("Ура! 🥰", null)
                 .show();
     }
 

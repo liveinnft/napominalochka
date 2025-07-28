@@ -307,11 +307,23 @@
                     </div>
                 </div>
 
-                <div class="file-drop-zone" onclick="document.getElementById('file-input').click()">
+                <div class="file-drop-zone" onclick="openFileSelector()">
                     <p>📁 Нажмите для выбора файлов или перетащите сюда</p>
                     <p style="color: #666; font-size: 0.9rem;">Поддерживаются: JPG, PNG, MP4, MOV</p>
                     <p style="color: #28a745; font-size: 0.8rem;">✨ Файлы автоматически переименуются: photo1.jpg, photo2.png, video1, video2...</p>
-                    <input type="file" id="file-input" multiple accept="image/*,video/*" style="display: none;" onchange="handleFiles(this.files)">
+                    <input type="file" id="file-input" multiple accept="image/*,video/*,image/jpeg,image/jpg,image/png,image/gif,video/mp4,video/mov,video/avi" capture="environment" style="display: none;" onchange="handleFiles(this.files)">
+                </div>
+
+                <!-- Дополнительные кнопки для мобильных устройств -->
+                <div class="mobile-buttons" style="display: none; margin-top: 15px; text-align: center;">
+                    <button class="btn" onclick="selectPhotos()" style="margin: 5px;">📷 Выбрать фото</button>
+                    <button class="btn" onclick="selectVideos()" style="margin: 5px;">🎬 Выбрать видео</button>
+                    <button class="btn btn-secondary" onclick="takePhoto()" style="margin: 5px;">📸 Сделать фото</button>
+                </div>
+
+                <!-- Кнопка диагностики -->
+                <div style="margin-top: 15px; text-align: center;">
+                    <button class="btn btn-secondary" onclick="runDiagnostics()" style="font-size: 0.8rem;">🔧 Проверить поддержку браузера</button>
                 </div>
 
                 <div class="file-preview" id="file-preview"></div>

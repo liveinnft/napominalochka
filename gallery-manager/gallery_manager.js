@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadTextCategory();
     updateStatistics();
     setupDragAndDrop();
+    setupMobileSupport();
     
     // Загружаем сохраненные данные
     loadSavedData();
@@ -60,6 +61,134 @@ function setupDragAndDrop() {
         dropZone.classList.remove('dragover');
         handleFiles(e.dataTransfer.files);
     });
+}
+
+// Настройка мобильной поддержки
+function setupMobileSupport() {
+    // Определяем мобильное устройство
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // Показываем мобильные кнопки
+        const mobileButtons = document.querySelector('.mobile-buttons');
+        if (mobileButtons) {
+            mobileButtons.style.display = 'block';
+        }
+        
+        // Обновляем текст в зоне загрузки
+        const dropZone = document.querySelector('.file-drop-zone');
+        if (dropZone) {
+            const firstP = dropZone.querySelector('p');
+            if (firstP) {
+                firstP.textContent = '📱 Нажмите для выбора файлов или используйте кнопки ниже';
+            }
+        }
+    }
+}
+
+// Функции для мобильных устройств
+function openFileSelector() {
+    try {
+        document.getElementById('file-input').click();
+    } catch (error) {
+        console.log('Ошибка открытия файлового диалога:', error);
+        alert('Попробуйте использовать кнопки ниже для выбора файлов');
+    }
+}
+
+function selectPhotos() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    
+    input.onchange = function(e) {
+        handleFiles(e.target.files);
+    };
+    
+    input.click();
+}
+
+function selectVideos() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = 'video/*';
+    input.capture = 'environment';
+    
+    input.onchange = function(e) {
+        handleFiles(e.target.files);
+    };
+    
+    input.click();
+}
+
+function takePhoto() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'camera';
+    
+    input.onchange = function(e) {
+        handleFiles(e.target.files);
+    };
+    
+    input.click();
+}
+
+// Диагностика поддержки браузера
+function runDiagnostics() {
+    const results = [];
+    
+    // Проверка основных API
+    results.push(`User Agent: ${navigator.userAgent}`);
+    results.push(`File API: ${typeof File !== 'undefined' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    results.push(`FileReader API: ${typeof FileReader !== 'undefined' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    results.push(`URL.createObjectURL: ${typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    results.push(`Blob API: ${typeof Blob !== 'undefined' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    
+    // Проверка input[type=file]
+    const testInput = document.createElement('input');
+    testInput.type = 'file';
+    results.push(`Input file: ${testInput.type === 'file' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    results.push(`Multiple files: ${typeof testInput.multiple !== 'undefined' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    results.push(`Accept attribute: ${typeof testInput.accept !== 'undefined' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    results.push(`Capture attribute: ${typeof testInput.capture !== 'undefined' ? '✅ Поддерживается' : '❌ Не поддерживается'}`);
+    
+    // Информация о безопасности
+    results.push(`HTTPS: ${location.protocol === 'https:' ? '✅ Да' : '⚠️ Нет (некоторые функции могут не работать)'}`);
+    results.push(`Размер экрана: ${screen.width}x${screen.height}`);
+    results.push(`Viewport: ${window.innerWidth}x${window.innerHeight}`);
+    
+    // Мобильное устройство
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    results.push(`Мобильное устройство: ${isMobile ? '✅ Да' : '❌ Нет'}`);
+    
+    // Проверка медиа устройств
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        results.push(`Camera API: ✅ Поддерживается`);
+    } else {
+        results.push(`Camera API: ❌ Не поддерживается`);
+    }
+    
+    // Вывод результатов
+    const resultText = results.join('\n');
+    console.log('Диагностика браузера:', resultText);
+    
+    // Показываем в алерте и в превью
+    alert('Результаты диагностики:\n\n' + resultText);
+    
+    const preview = document.getElementById('file-preview');
+    preview.innerHTML = `
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h4>🔧 Диагностика браузера</h4>
+            <pre style="white-space: pre-wrap; font-size: 0.8rem; color: #333;">${resultText}</pre>
+            <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">
+                Если видите ❌ или ⚠️, это может объяснить проблемы с загрузкой файлов.
+            </p>
+        </div>
+    `;
 }
 
 // Переключение между секциями
@@ -88,8 +217,22 @@ function showSection(sectionId) {
 
 // Обработка файлов
 function handleFiles(files) {
-    currentFiles = Array.from(files);
-    displayFilePreview();
+    console.log('handleFiles вызван с', files?.length || 0, 'файлами');
+    
+    if (!files || files.length === 0) {
+        console.log('Файлы не выбраны или пустой список');
+        alert('Файлы не выбраны. Попробуйте ещё раз.');
+        return;
+    }
+    
+    try {
+        currentFiles = Array.from(files);
+        console.log('Файлы успешно обработаны:', currentFiles.map(f => f.name));
+        displayFilePreview();
+    } catch (error) {
+        console.error('Ошибка при обработке файлов:', error);
+        alert('Ошибка при обработке файлов: ' + error.message);
+    }
 }
 
 // Отображение превью файлов
@@ -108,22 +251,68 @@ function displayFilePreview() {
         fileDiv.style.display = 'inline-block';
         fileDiv.style.margin = '10px';
         fileDiv.style.textAlign = 'center';
+        fileDiv.style.maxWidth = '200px';
+        fileDiv.style.wordBreak = 'break-word';
         
-        if (file.type.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.style.maxWidth = '150px';
-            img.style.maxHeight = '150px';
-            img.style.borderRadius = '10px';
-            fileDiv.appendChild(img);
-        } else if (file.type.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(file);
-            video.controls = true;
-            video.style.maxWidth = '150px';
-            video.style.maxHeight = '150px';
-            video.style.borderRadius = '10px';
-            fileDiv.appendChild(video);
+        try {
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = '150px';
+                img.style.maxHeight = '150px';
+                img.style.borderRadius = '10px';
+                img.style.objectFit = 'cover';
+                
+                // Обработка ошибок загрузки изображения
+                img.onerror = function() {
+                    console.error('Ошибка загрузки изображения:', file.name);
+                    this.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.innerHTML = '❌ Ошибка загрузки изображения';
+                    errorDiv.style.color = 'red';
+                    errorDiv.style.fontSize = '0.8rem';
+                    fileDiv.appendChild(errorDiv);
+                };
+                
+                fileDiv.appendChild(img);
+                
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.style.maxWidth = '150px';
+                video.style.maxHeight = '150px';
+                video.style.borderRadius = '10px';
+                video.preload = 'metadata';
+                
+                // Обработка ошибок загрузки видео
+                video.onerror = function() {
+                    console.error('Ошибка загрузки видео:', file.name);
+                    this.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.innerHTML = '❌ Ошибка загрузки видео';
+                    errorDiv.style.color = 'red';
+                    errorDiv.style.fontSize = '0.8rem';
+                    fileDiv.appendChild(errorDiv);
+                };
+                
+                fileDiv.appendChild(video);
+                
+            } else {
+                // Неподдерживаемый тип файла
+                const fileIcon = document.createElement('div');
+                fileIcon.innerHTML = '📄';
+                fileIcon.style.fontSize = '48px';
+                fileIcon.style.marginBottom = '10px';
+                fileDiv.appendChild(fileIcon);
+            }
+        } catch (error) {
+            console.error('Ошибка создания превью для файла:', file.name, error);
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = '❌ Ошибка создания превью';
+            errorDiv.style.color = 'red';
+            errorDiv.style.fontSize = '0.8rem';
+            fileDiv.appendChild(errorDiv);
         }
         
         const fileName = document.createElement('p');
@@ -131,10 +320,27 @@ function displayFilePreview() {
         fileName.style.marginTop = '5px';
         fileName.style.fontSize = '0.8rem';
         fileName.style.color = '#666';
+        fileName.style.wordBreak = 'break-all';
         fileDiv.appendChild(fileName);
+        
+        // Информация о размере файла
+        const fileSize = document.createElement('p');
+        fileSize.textContent = formatFileSize(file.size);
+        fileSize.style.fontSize = '0.7rem';
+        fileSize.style.color = '#999';
+        fileDiv.appendChild(fileSize);
         
         preview.appendChild(fileDiv);
     });
+}
+
+// Форматирование размера файла
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 // Добавление элемента в галерею

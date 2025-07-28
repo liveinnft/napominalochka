@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест менеджера галереи</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тест менеджера галереи "Напоминалочка"</h1>
+    
+    <div class="test-section">
+        <h2>🚀 Быстрый старт</h2>
+        <p>Этот файл поможет протестировать основные функции менеджера галереи.</p>
+        <button class="test-button" onclick="openGalleryManager()">📱 Открыть менеджер галереи</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Проверочный список функций</h2>
+        <div id="checklist">
+            <label><input type="checkbox"> ✅ Открытие приложения</label><br>
+            <label><input type="checkbox"> ✅ Переключение между вкладками</label><br>
+            <label><input type="checkbox"> ✅ Загрузка тестовых изображений</label><br>
+            <label><input type="checkbox"> ✅ Добавление заголовков и описаний</label><br>
+            <label><input type="checkbox"> ✅ Редактирование текстов</label><br>
+            <label><input type="checkbox"> ✅ Экспорт GalleryConfig.java</label><br>
+            <label><input type="checkbox"> ✅ Экспорт AppTexts.java</label><br>
+            <label><input type="checkbox"> ✅ Создание архива с медиа</label><br>
+            <label><input type="checkbox"> ✅ Полный экспорт</label><br>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Тестовые данные</h2>
+        <p>Вы можете использовать эти примеры для тестирования:</p>
+        
+        <h3>📝 Примеры заголовков:</h3>
+        <ul>
+            <li>💕 Наша первая встреча</li>
+            <li>🌅 Закат на крыше</li>
+            <li>🎬 Наше смешное видео</li>
+            <li>☀️ Солнечное утро</li>
+        </ul>
+
+        <h3>📖 Примеры описаний:</h3>
+        <ul>
+            <li>Помнишь этот день? Мы тогда так волновались, а теперь смотрю на это фото и улыбаюсь...</li>
+            <li>Самый красивый закат, потому что мы смотрели на него вместе. Твоя рука в моей...</li>
+            <li>Это видео всегда поднимает мне настроение! Твой смех лечит любую печаль</li>
+            <li>Доброе утро начинается с мыслей о тебе. Ты мое солнышко! ☀️</li>
+        </ul>
+
+        <h3>💌 Примеры сообщений любви:</h3>
+        <ul>
+            <li>🤍 коткночек мой любимый, ты у меня самая самая!!</li>
+            <li>💕 мы со всем всем справимся, я клянусь!!</li>
+            <li>🌟 ты моя огромная умничка и я горжусь тобой прям!!</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Тестирование функций</h2>
+        <button class="test-button" onclick="createTestImage()">🖼️ Создать тестовое изображение</button>
+        <button class="test-button" onclick="testLocalStorage()">💾 Тест сохранения данных</button>
+        <button class="test-button" onclick="testDownload()">📥 Тест скачивания</button>
+        
+        <div id="test-results" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Ожидаемые результаты</h2>
+        <p>После успешного тестирования вы должны получить:</p>
+        <ul>
+            <li><strong>GalleryConfig.java</strong> - файл с массивом GALLERY_ITEMS</li>
+            <li><strong>AppTexts.java</strong> - файл со всеми текстами приложения</li>
+            <li><strong>media_files.zip</strong> - архив с фото в папке photos/ и видео в videos/</li>
+            <li><strong>napominalochka_export.zip</strong> - полный экспорт со всеми файлами</li>
+        </ul>
+    </div>
+
+    <script>
+        function openGalleryManager() {
+            window.open('gallery_manager.html', '_blank');
+        }
+
+        function createTestImage() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 400;
+            canvas.height = 300;
+            const ctx = canvas.getContext('2d');
+            
+            // Создаем градиентный фон
+            const gradient = ctx.createLinearGradient(0, 0, 400, 300);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 400, 300);
+            
+            // Добавляем текст
+            ctx.fillStyle = 'white';
+            ctx.font = '32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('💕', 200, 120);
+            ctx.font = '16px Arial';
+            ctx.fillText('Тестовое изображение', 200, 160);
+            ctx.fillText('для галереи', 200, 180);
+            ctx.fillText(new Date().toLocaleDateString(), 200, 220);
+            
+            // Конвертируем в blob и скачиваем
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'test_photo.png';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                document.getElementById('test-results').innerHTML = 
+                    '<div class="success">✅ Тестовое изображение создано и скачано!</div>';
+            });
+        }
+
+        function testLocalStorage() {
+            try {
+                const testData = {
+                    test: true,
+                    timestamp: Date.now(),
+                    message: 'Тест localStorage'
+                };
+                
+                localStorage.setItem('napominalochka_test', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('napominalochka_test'));
+                
+                if (retrieved && retrieved.test === true) {
+                    document.getElementById('test-results').innerHTML = 
+                        '<div class="success">✅ localStorage работает корректно!</div>';
+                } else {
+                    throw new Error('Данные не совпадают');
+                }
+                
+                localStorage.removeItem('napominalochka_test');
+            } catch (error) {
+                document.getElementById('test-results').innerHTML = 
+                    '<div class="error">❌ Ошибка localStorage: ' + error.message + '</div>';
+            }
+        }
+
+        function testDownload() {
+            const testContent = `// Тестовый файл GalleryConfig.java
+package com.napominalochka.app.config;
+
+public class GalleryConfig {
+    public static final String[][] GALLERY_ITEMS = {
+        {"photo", "test_photo.png", "Тестовое фото", "Описание тестового фото"},
+        {"video", "test_video", "Тестовое видео", "Описание тестового видео"}
+    };
+}`;
+            
+            const blob = new Blob([testContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'test_GalleryConfig.java';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            document.getElementById('test-results').innerHTML = 
+                '<div class="success">✅ Тестовый файл GalleryConfig.java скачан!</div>';
+        }
+
+        // Автоматическая проверка совместимости браузера
+        window.onload = function() {
+            const features = {
+                'localStorage': typeof(Storage) !== "undefined",
+                'FileReader': typeof(FileReader) !== "undefined",
+                'Canvas': !!document.createElement('canvas').getContext,
+                'Blob': typeof(Blob) !== "undefined"
+            };
+            
+            let allSupported = true;
+            let report = '<h3>🔍 Проверка совместимости браузера:</h3>';
+            
+            for (let feature in features) {
+                const supported = features[feature];
+                allSupported = allSupported && supported;
+                report += `<div class="${supported ? 'success' : 'error'}">
+                    ${supported ? '✅' : '❌'} ${feature}: ${supported ? 'Поддерживается' : 'Не поддерживается'}
+                </div>`;
+            }
+            
+            if (allSupported) {
+                report += '<div class="success"><strong>🎉 Ваш браузер полностью совместим!</strong></div>';
+            } else {
+                report += '<div class="error"><strong>⚠️ Некоторые функции могут не работать</strong></div>';
+            }
+            
+            document.getElementById('test-results').innerHTML = report;
+        };
+    </script>
+</body>
+</html>

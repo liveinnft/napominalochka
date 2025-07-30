@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Менеджер галереи "Напоминалочка" - Исправленная версия</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .file-upload {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .gallery-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .preview {
+            margin: 20px 0;
+        }
+
+        .preview img,
+        .preview video {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 10px;
+            margin: 5px;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #ffeaea;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #27ae60;
+            background: #eafaf1;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💖 Менеджер галереи "Напоминалочка"</h1>
+            <p>Исправленная версия - Работает на всех устройствах</p>
+        </div>
+
+        <div class="section">
+            <h2>🖼️ Загрузка файлов</h2>
+            
+            <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                <p>📁 Нажмите для выбора файлов</p>
+                <p style="color: #666; font-size: 0.9rem;">Поддерживаются: JPG, PNG, MP4, MOV</p>
+                <input type="file" id="fileInput" multiple accept="image/*,video/*" onchange="handleFileSelect(event)">
+            </div>
+
+            <!-- Дополнительные кнопки для мобильных -->
+            <div style="text-align: center; margin: 10px 0;">
+                <button class="btn" onclick="selectFiles('image/*')">📷 Выбрать фото</button>
+                <button class="btn" onclick="selectFiles('video/*')">🎬 Выбрать видео</button>
+                <button class="btn" onclick="testBrowser()">🔧 Тест браузера</button>
+            </div>
+
+            <div id="filePreview" class="preview"></div>
+
+            <div class="form-group">
+                <label for="title">Заголовок:</label>
+                <input type="text" id="title" placeholder="Например: 💕 Наша первая встреча">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Описание:</label>
+                <textarea id="description" placeholder="Добавьте красивое описание..."></textarea>
+            </div>
+
+            <button class="btn" onclick="addToGallery()">➕ Добавить в галерею</button>
+            <button class="btn btn-danger" onclick="clearFiles()">🗑️ Очистить</button>
+        </div>
+
+        <div class="section">
+            <h2>📋 Галерея</h2>
+            <div id="galleryList"></div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn" onclick="exportGalleryConfig()">📄 Скачать GalleryConfig.java</button>
+                <button class="btn" onclick="exportAppTexts()">📄 Скачать AppTexts.java</button>
+                <button class="btn" onclick="exportMediaFiles()">📦 Скачать архив с медиа</button>
+                <button class="btn" onclick="exportAll()">🎁 Скачать всё одним архивом</button>
+            </div>
+        </div>
+
+        <div id="messages"></div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let galleryItems = [];
+        let currentFiles = [];
+        let mediaFiles = new Map();
+
+        // Тексты приложения
+        const appTexts = {
+            loveMessages: [
+                "🤍 коткночек мой любимый, ты у меня самая самая!!",
+                "💕 мы со всем всем справимся, я клянусь!!",
+                "🌟 ты моя огромная умничка и я горжусь тобой прям!!"
+            ],
+            missions: [
+                ["Утренняя нежность", "Пошли мне голосовое сообщение с пожеланием доброго утра 🌅"],
+                ["Селфи с улыбкой", "Сделай селфи с самой красивой улыбкой и пришли мне 😊"]
+            ]
+        };
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Приложение инициализировано');
+            loadSavedData();
+            updateDisplay();
+        });
+
+        // Обработка выбора файлов
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            console.log('Выбрано файлов:', files.length);
+            
+            if (files.length === 0) {
+                showMessage('Файлы не выбраны', 'error');
+                return;
+            }
+
+            currentFiles = Array.from(files);
+            displayPreview();
+            showMessage(`Выбрано файлов: ${files.length}`, 'success');
+        }
+
+        // Альтернативный выбор файлов для мобильных
+        function selectFiles(accept) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = accept;
+            
+            input.onchange = function(e) {
+                handleFileSelect(e);
+            };
+            
+            input.click();
+        }
+
+        // Отображение превью
+        function displayPreview() {
+            const preview = document.getElementById('filePreview');
+            preview.innerHTML = '';
+
+            if (currentFiles.length === 0) return;
+
+            currentFiles.forEach((file, index) => {
+                const div = document.createElement('div');
+                div.style.display = 'inline-block';
+                div.style.margin = '10px';
+                div.style.textAlign = 'center';
+
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    div.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true;
+                    div.appendChild(video);
+                }
+
+                const name = document.createElement('p');
+                name.textContent = file.name;
+                name.style.fontSize = '0.8rem';
+                name.style.marginTop = '5px';
+                div.appendChild(name);
+
+                preview.appendChild(div);
+            });
+        }
+
+        // Добавление в галерею
+        function addToGallery() {
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            if (!title || !description) {
+                showMessage('Заполните заголовок и описание', 'error');
+                return;
+            }
+
+            if (currentFiles.length === 0) {
+                showMessage('Выберите файлы', 'error');
+                return;
+            }
+
+            currentFiles.forEach(file => {
+                const type = file.type.startsWith('image/') ? 'photo' : 'video';
+                const photoCount = galleryItems.filter(item => item.type === 'photo').length + 1;
+                const videoCount = galleryItems.filter(item => item.type === 'video').length + 1;
+                
+                const fileName = type === 'photo' ? 
+                    `photo${photoCount}.${file.name.split('.').pop()}` : 
+                    `video${videoCount}`;
+
+                const item = {
+                    type: type,
+                    fileName: fileName,
+                    title: title,
+                    description: description,
+                    originalName: file.name
+                };
+
+                galleryItems.push(item);
+                mediaFiles.set(fileName, file);
+            });
+
+            // Очистка формы
+            document.getElementById('title').value = '';
+            document.getElementById('description').value = '';
+            clearFiles();
+
+            updateDisplay();
+            saveData();
+            showMessage('Добавлено в галерею!', 'success');
+        }
+
+        // Очистка файлов
+        function clearFiles() {
+            currentFiles = [];
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreview').innerHTML = '';
+        }
+
+        // Обновление отображения
+        function updateDisplay() {
+            const list = document.getElementById('galleryList');
+            list.innerHTML = '';
+
+            if (galleryItems.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #666;">Пока нет элементов</p>';
+                return;
+            }
+
+            galleryItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'gallery-item';
+                div.innerHTML = `
+                    <h4>${item.title}</h4>
+                    <p><strong>Тип:</strong> ${item.type === 'photo' ? '📷 Фото' : '🎬 Видео'}</p>
+                    <p><strong>Исходный файл:</strong> ${item.originalName}</p>
+                    <p><strong>Имя в приложении:</strong> <code>${item.fileName}</code></p>
+                    <p><strong>Описание:</strong> ${item.description}</p>
+                    <button class="btn btn-danger" onclick="removeItem(${index})">🗑️ Удалить</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Удаление элемента
+        function removeItem(index) {
+            if (confirm('Удалить этот элемент?')) {
+                const item = galleryItems[index];
+                mediaFiles.delete(item.fileName);
+                galleryItems.splice(index, 1);
+                updateDisplay();
+                saveData();
+                showMessage('Элемент удален', 'success');
+            }
+        }
+
+        // Показ сообщений
+        function showMessage(text, type) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = text;
+            messages.appendChild(div);
+
+            setTimeout(() => {
+                div.remove();
+            }, 5000);
+        }
+
+        // Сохранение данных
+        function saveData() {
+            try {
+                localStorage.setItem('gallery_data', JSON.stringify(galleryItems));
+                console.log('Данные сохранены');
+            } catch (e) {
+                console.error('Ошибка сохранения:', e);
+            }
+        }
+
+        // Загрузка данных
+        function loadSavedData() {
+            try {
+                const saved = localStorage.getItem('gallery_data');
+                if (saved) {
+                    galleryItems = JSON.parse(saved);
+                    console.log('Данные загружены:', galleryItems.length, 'элементов');
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки:', e);
+            }
+        }
+
+        // Экспорт GalleryConfig.java
+        function exportGalleryConfig() {
+            let javaCode = `package com.napominalochka.app.config;
+
+public class GalleryConfig {
+    
+    public static final String[][] GALLERY_ITEMS = {
+`;
+
+            galleryItems.forEach((item, index) => {
+                const comma = index < galleryItems.length - 1 ? ',' : '';
+                javaCode += `        {"${item.type}", "${item.fileName}", "${item.title.replace(/"/g, '\\"')}", "${item.description.replace(/"/g, '\\"')}"}${comma}\n`;
+            });
+
+            javaCode += `    };
+    
+    public static boolean isVideo(String[] item) {
+        return "video".equals(item[0]);
+    }
+    
+    public static String getFileName(String[] item) {
+        return item[1];
+    }
+    
+    public static String getTitle(String[] item) {
+        return item[2];
+    }
+    
+    public static String getDescription(String[] item) {
+        return item[3];
+    }
+}`;
+
+            downloadFile('GalleryConfig.java', javaCode);
+            showMessage('GalleryConfig.java скачан!', 'success');
+        }
+
+        // Экспорт AppTexts.java
+        function exportAppTexts() {
+            let javaCode = `package com.napominalochka.app.config;
+
+public class AppTexts {
+    
+    public static final String SECRET_CODE = "ЛЮБОВЬ";
+    
+    public static final String[] LOVE_MESSAGES = {
+`;
+
+            appTexts.loveMessages.forEach((msg, index) => {
+                const comma = index < appTexts.loveMessages.length - 1 ? ',' : '';
+                javaCode += `        "${msg.replace(/"/g, '\\"')}"${comma}\n`;
+            });
+
+            javaCode += `    };
+    
+    public static final String[][] MISSIONS = {
+`;
+
+            appTexts.missions.forEach((mission, index) => {
+                const comma = index < appTexts.missions.length - 1 ? ',' : '';
+                javaCode += `        {"${mission[0].replace(/"/g, '\\"')}", "${mission[1].replace(/"/g, '\\"')}"}${comma}\n`;
+            });
+
+            javaCode += `    };
+}`;
+
+            downloadFile('AppTexts.java', javaCode);
+            showMessage('AppTexts.java скачан!', 'success');
+        }
+
+        // Скачивание файла
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+                 // Экспорт медиа файлов
+         async function exportMediaFiles() {
+             if (mediaFiles.size === 0) {
+                 showMessage('Нет медиа файлов для экспорта', 'error');
+                 return;
+             }
+
+             try {
+                 showMessage('Создание архива...', 'success');
+                 
+                 // Загружаем JSZip библиотеку
+                 if (typeof JSZip === 'undefined') {
+                     await loadJSZip();
+                 }
+
+                 const zip = new JSZip();
+                 const photosFolder = zip.folder("photos");
+                 const videosFolder = zip.folder("videos");
+
+                 // Добавляем файлы в архив
+                 for (const [fileName, file] of mediaFiles.entries()) {
+                     const isPhoto = file.type.startsWith('image/');
+                     const folder = isPhoto ? photosFolder : videosFolder;
+                     
+                     // Для видео добавляем расширение при сохранении в архив
+                     let finalFileName = fileName;
+                     if (!isPhoto && !fileName.includes('.')) {
+                         const originalExtension = file.name.split('.').pop();
+                         finalFileName = `${fileName}.${originalExtension}`;
+                     }
+                     
+                     folder.file(finalFileName, file);
+                 }
+
+                 // Создаем и скачиваем архив
+                 const content = await zip.generateAsync({type: "blob"});
+                 downloadFile('media_files.zip', content);
+                 showMessage('Архив с медиа файлами скачан!', 'success');
+
+             } catch (error) {
+                 console.error('Ошибка создания архива:', error);
+                 showMessage('Ошибка создания архива: ' + error.message, 'error');
+             }
+         }
+
+         // Экспорт всего одним архивом
+         async function exportAll() {
+             try {
+                 showMessage('Создание полного архива...', 'success');
+                 
+                 // Загружаем JSZip библиотеку
+                 if (typeof JSZip === 'undefined') {
+                     await loadJSZip();
+                 }
+
+                 const zip = new JSZip();
+
+                 // Добавляем Java файлы
+                 zip.file("GalleryConfig.java", generateGalleryConfigContent());
+                 zip.file("AppTexts.java", generateAppTextsContent());
+
+                 // Добавляем медиа файлы
+                 if (mediaFiles.size > 0) {
+                     const photosFolder = zip.folder("media/photos");
+                     const videosFolder = zip.folder("media/videos");
+
+                     for (const [fileName, file] of mediaFiles.entries()) {
+                         const isPhoto = file.type.startsWith('image/');
+                         const folder = isPhoto ? photosFolder : videosFolder;
+                         
+                         let finalFileName = fileName;
+                         if (!isPhoto && !fileName.includes('.')) {
+                             const originalExtension = file.name.split('.').pop();
+                             finalFileName = `${fileName}.${originalExtension}`;
+                         }
+                         
+                         folder.file(finalFileName, file);
+                     }
+                 }
+
+                 // Добавляем README
+                 const readme = `# Экспорт "Напоминалочка"
+
+Дата создания: ${new Date().toLocaleString('ru-RU')}
+
+Содержимое:
+- GalleryConfig.java (${galleryItems.length} элементов)
+- AppTexts.java (тексты приложения)
+- media/photos/ (фотографии: ${galleryItems.filter(i => i.type === 'photo').length} файлов)
+- media/videos/ (видео: ${galleryItems.filter(i => i.type === 'video').length} файлов)
+
+Инструкция:
+1. Скопируйте Java файлы в app/src/main/java/com/napominalochka/app/config/
+2. Скопируйте фото в app/src/main/res/drawable/
+3. Скопируйте видео в app/src/main/res/raw/
+4. Пересоберите Android проект`;
+
+                 zip.file("README.md", readme);
+
+                 // Создаем и скачиваем архив
+                 const content = await zip.generateAsync({type: "blob"});
+                 downloadFile('napominalochka_full_export.zip', content);
+                 showMessage('Полный архив создан и скачан!', 'success');
+
+             } catch (error) {
+                 console.error('Ошибка создания полного архива:', error);
+                 showMessage('Ошибка создания архива: ' + error.message, 'error');
+             }
+         }
+
+         // Генерация содержимого GalleryConfig.java
+         function generateGalleryConfigContent() {
+             let javaCode = `package com.napominalochka.app.config;
+
+public class GalleryConfig {
+    
+    public static final String[][] GALLERY_ITEMS = {
+`;
+
+             galleryItems.forEach((item, index) => {
+                 const comma = index < galleryItems.length - 1 ? ',' : '';
+                 javaCode += `        {"${item.type}", "${item.fileName}", "${item.title.replace(/"/g, '\\"')}", "${item.description.replace(/"/g, '\\"')}"}${comma}\n`;
+             });
+
+             javaCode += `    };
+    
+    public static boolean isVideo(String[] item) {
+        return "video".equals(item[0]);
+    }
+    
+    public static String getFileName(String[] item) {
+        return item[1];
+    }
+    
+    public static String getTitle(String[] item) {
+        return item[2];
+    }
+    
+    public static String getDescription(String[] item) {
+        return item[3];
+    }
+}`;
+
+             return javaCode;
+         }
+
+         // Генерация содержимого AppTexts.java
+         function generateAppTextsContent() {
+             let javaCode = `package com.napominalochka.app.config;
+
+public class AppTexts {
+    
+    public static final String SECRET_CODE = "ЛЮБОВЬ";
+    
+    public static final String[] LOVE_MESSAGES = {
+`;
+
+             appTexts.loveMessages.forEach((msg, index) => {
+                 const comma = index < appTexts.loveMessages.length - 1 ? ',' : '';
+                 javaCode += `        "${msg.replace(/"/g, '\\"')}"${comma}\n`;
+             });
+
+             javaCode += `    };
+    
+    public static final String[][] MISSIONS = {
+`;
+
+             appTexts.missions.forEach((mission, index) => {
+                 const comma = index < appTexts.missions.length - 1 ? ',' : '';
+                 javaCode += `        {"${mission[0].replace(/"/g, '\\"')}", "${mission[1].replace(/"/g, '\\"')}"}${comma}\n`;
+             });
+
+             javaCode += `    };
+}`;
+
+             return javaCode;
+         }
+
+         // Загрузка JSZip библиотеки
+         async function loadJSZip() {
+             return new Promise((resolve, reject) => {
+                 const script = document.createElement('script');
+                 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                 script.onload = () => resolve();
+                 script.onerror = () => reject(new Error('Не удалось загрузить библиотеку JSZip'));
+                 document.head.appendChild(script);
+             });
+         }
+
+         // Тест браузера
+         function testBrowser() {
+             const results = [];
+             results.push(`Браузер: ${navigator.userAgent}`);
+             results.push(`File API: ${typeof File !== 'undefined' ? '✅' : '❌'}`);
+             results.push(`FileReader: ${typeof FileReader !== 'undefined' ? '✅' : '❌'}`);
+             results.push(`URL.createObjectURL: ${typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function' ? '✅' : '❌'}`);
+             results.push(`LocalStorage: ${typeof Storage !== 'undefined' ? '✅' : '❌'}`);
+             results.push(`JSZip support: ${typeof JSZip !== 'undefined' ? '✅' : '⏳ Загрузится при экспорте'}`);
+             
+             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+             results.push(`Мобильное устройство: ${isMobile ? '✅' : '❌'}`);
+
+             alert('Диагностика браузера:\n\n' + results.join('\n'));
+         }
+    </script>
+</body>
+</html>

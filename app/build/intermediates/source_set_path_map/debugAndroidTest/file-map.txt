@@ -1,0 +1,6 @@
+com.napominalochka.app.test.app-androidTest-0 C:\Android\projects\napominalochka\app\build\generated\res\resValues\androidTest\debug
+com.napominalochka.app.test.app-mergeDebugAndroidTestResources-1 C:\Android\projects\napominalochka\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.napominalochka.app.test.app-mergeDebugAndroidTestResources-2 C:\Android\projects\napominalochka\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.napominalochka.app.test.app-merged_res-3 C:\Android\projects\napominalochka\app\build\intermediates\merged_res\debugAndroidTest
+com.napominalochka.app.test.app-core-1.5.0-4 C:\Users\Вячеслав\.gradle\caches\8.12\transforms\76ea11ef10fb3fe45fff23890c34aab8\transformed\core-1.5.0\res
+com.napominalochka.app.test.app-annotation-experimental-1.3.0-5 C:\Users\Вячеслав\.gradle\caches\8.12\transforms\e81c50d5bf5fddfbbdd6d2c43c6361f0\transformed\annotation-experimental-1.3.0\res

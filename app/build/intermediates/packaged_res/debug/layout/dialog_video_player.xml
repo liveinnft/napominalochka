@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/warm_background"
+    android:padding="16dp">
+
+    <!-- Video Title -->
+    <TextView
+        android:id="@+id/video_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🎬 Видео"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/warm_primary"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Video Surface Container -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/black"
+        android:layout_marginBottom="16dp">
+
+        <!-- Surface View for Video -->
+        <SurfaceView
+            android:id="@+id/surface_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+        <!-- Loading indicator -->
+        <ProgressBar
+            android:id="@+id/loading_progress"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/warm_primary" />
+
+        <!-- Error/Status text -->
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="⏳ Загрузка видео..."
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:background="@color/black"
+            android:padding="8dp"
+            android:alpha="0.8" />
+
+    </FrameLayout>
+
+    <!-- Video Description -->
+    <TextView
+        android:id="@+id/video_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Описание видео"
+        android:textSize="14sp"
+        android:textColor="@color/warm_on_surface"
+        android:layout_marginBottom="16dp"
+        android:maxLines="3"
+        android:ellipsize="end" />
+
+    <!-- Control Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/play_pause_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="▶️ Играть"
+            android:backgroundTint="@color/warm_primary"
+            android:textColor="@color/white"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💕 Закрыть"
+            android:backgroundTint="@color/warm_accent"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>

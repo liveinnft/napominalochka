@@ -1,0 +1,3 @@
+com.napominalochka.app.test
+style WhiteBackgroundDialogTheme
+style WhiteBackgroundTheme

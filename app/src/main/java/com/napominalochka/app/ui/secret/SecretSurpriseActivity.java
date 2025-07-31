@@ -12,7 +12,7 @@ import com.napominalochka.app.utils.SharedPrefsManager;
 
 public class SecretSurpriseActivity extends AppCompatActivity {
     
-    private TextView statusText, secretContentText;
+    private TextView statusText, secretContentText, progressText;
     private Button unlockButton;
     private SharedPrefsManager prefsManager;
 
@@ -36,6 +36,7 @@ public class SecretSurpriseActivity extends AppCompatActivity {
     private void initViews() {
         statusText = findViewById(R.id.status_text);
         secretContentText = findViewById(R.id.secret_content_text);
+        progressText = findViewById(R.id.progress_text);
         unlockButton = findViewById(R.id.unlock_button);
         
         unlockButton.setOnClickListener(v -> showUnlockDialog());
@@ -43,18 +44,20 @@ public class SecretSurpriseActivity extends AppCompatActivity {
 
     private void updateUnlockStatus() {
         boolean isUnlocked = prefsManager.isSecretUnlocked();
+        int foundWords = prefsManager.getFoundSecretWordsCount();
         
         if (isUnlocked) {
             showUnlockedContent();
         } else {
-            showLockedContent();
+            showLockedContent(foundWords);
         }
     }
 
-    private void showLockedContent() {
+    private void showLockedContent(int foundWords) {
         statusText.setText("🔒 ЗАБЛОКИРОВАНО");
+        progressText.setText("Найдено слов: " + foundWords + "/10");
         secretContentText.setText("Этот раздел будет разблокирован:\n\n" +
-                "• По кодовому слову 🗝️\n" +
+                "• После отгадывания 10 кодовых слов 🗝️\n" +
                 "• После завершения путешествия 🎲\n" +
                 "• Когда наступит особый день 📅\n\n" +
                 "Внутри ждет самый важный сюрприз! 💝\n\n" +
@@ -66,6 +69,7 @@ public class SecretSurpriseActivity extends AppCompatActivity {
 
     private void showUnlockedContent() {
         statusText.setText("🎁 РАЗБЛОКИРОВАНО!");
+        progressText.setText("Найдено слов: 10/10");
         secretContentText.setText(AppTexts.SECRET_MESSAGE);
         
         unlockButton.setVisibility(Button.GONE);
@@ -82,12 +86,31 @@ public class SecretSurpriseActivity extends AppCompatActivity {
         builder.setPositiveButton(getString(R.string.unlock), (dialog, which) -> {
             String enteredCode = input.getText().toString().trim().toUpperCase();
             
-            if (enteredCode.equals(AppTexts.SECRET_CODE)) {
+            boolean wordFound = false;
+            for (String secretCode : AppTexts.SECRET_CODES) {
+                if (enteredCode.equals(secretCode)) {
+                    if (!prefsManager.isSecretWordFound(secretCode)) {
+                        prefsManager.addFoundSecretWord(secretCode);
+                        wordFound = true;
+                        showWordFoundSuccess(secretCode);
+                    } else {
+                        showWordAlreadyFound(secretCode);
+                    }
+                    break;
+                }
+            }
+            
+            if (!wordFound) {
+                showUnlockFailure();
+            }
+            
+            updateUnlockStatus();
+            
+            // Проверяем, нужно ли разблокировать секрет
+            if (prefsManager.getFoundSecretWordsCount() >= 10) {
                 prefsManager.setSecretUnlocked(true);
                 showUnlockSuccess();
                 updateUnlockStatus();
-            } else {
-                showUnlockFailure();
             }
         });
         
@@ -95,10 +118,30 @@ public class SecretSurpriseActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void showWordFoundSuccess(String word) {
+        int foundCount = prefsManager.getFoundSecretWordsCount();
+        new AlertDialog.Builder(this)
+                .setTitle("🎉 Отлично!")
+                .setMessage("Ты нашла слово: " + word + "! 🔓\n\n" +
+                           "Прогресс: " + foundCount + "/10 слов\n\n" +
+                           "Продолжай искать остальные слова! 💝")
+                .setPositiveButton("Продолжаю! 🥳", null)
+                .show();
+    }
+
+    private void showWordAlreadyFound(String word) {
+        new AlertDialog.Builder(this)
+                .setTitle("📝 Уже найдено!")
+                .setMessage("Слово '" + word + "' уже было найдено ранее!\n\n" +
+                           "Попробуй найти другое слово! 💭")
+                .setPositiveButton("Понятно 🤔", null)
+                .show();
+    }
+
     private void showUnlockSuccess() {
         new AlertDialog.Builder(this)
                 .setTitle("🎉 Поздравляю!")
-                .setMessage("Ты нашла правильное кодовое слово! 🔓\n\n" +
+                .setMessage("Ты нашла все 10 кодовых слов! 🔓\n\n" +
                            "Секретный сюрприз теперь доступен! 💝")
                 .setPositiveButton("Ура! 🥳", null)
                 .show();

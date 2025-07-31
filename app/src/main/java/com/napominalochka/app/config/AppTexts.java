@@ -2,8 +2,19 @@ package com.napominalochka.app.config;
 
 public class AppTexts {
 
-    // ========== СЕКРЕТНЫЙ КОД ==========
-    public static final String SECRET_CODE = "ШИШЕЧКА";
+    // ========== СЕКРЕТНЫЕ КОДЫ (10 СЛОВ) ==========
+    public static final String[] SECRET_CODES = {
+            "ШИШЕЧКА",
+            "КОТЕНОК",
+            "ЛЮБОВЬ",
+            "СЧАСТЬЕ",
+            "МЕЧТА",
+            "РАДОСТЬ",
+            "УЛЫБКА",
+            "СЕРДЦЕ",
+            "ЗВЕЗДА",
+            "СОЛНЦЕ"
+    };
 
     // ========== СООБЩЕНИЯ ЛЮБВИ (БАТАРЕЙКА) ==========
     public static final String[] LOVE_MESSAGES = {

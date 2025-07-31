@@ -22,6 +22,7 @@ public class SharedPrefsManager {
     private static final String KEY_VIDEO_CALLS = "video_calls";
     private static final String KEY_SMILES_SENT = "smiles_sent";
     private static final String KEY_SECRET_UNLOCKED = "secret_unlocked";
+    private static final String KEY_FOUND_SECRET_WORDS = "found_secret_words";
     private static final String KEY_LAST_MISSION_DATE = "last_mission_date";
 
     private SharedPreferences sharedPreferences;
@@ -177,6 +178,33 @@ public class SharedPrefsManager {
 
     public boolean isSecretUnlocked() {
         return sharedPreferences.getBoolean(KEY_SECRET_UNLOCKED, false);
+    }
+
+    // Found Secret Words
+    public void addFoundSecretWord(String word) {
+        String currentWords = getFoundSecretWords();
+        if (!currentWords.contains(word)) {
+            String newWords = currentWords.isEmpty() ? word : currentWords + "," + word;
+            editor.putString(KEY_FOUND_SECRET_WORDS, newWords);
+            editor.apply();
+        }
+    }
+
+    public String getFoundSecretWords() {
+        return sharedPreferences.getString(KEY_FOUND_SECRET_WORDS, "");
+    }
+
+    public int getFoundSecretWordsCount() {
+        String words = getFoundSecretWords();
+        if (words.isEmpty()) {
+            return 0;
+        }
+        return words.split(",").length;
+    }
+
+    public boolean isSecretWordFound(String word) {
+        String foundWords = getFoundSecretWords();
+        return foundWords.contains(word);
     }
 
     // Mission Management

@@ -63,7 +63,7 @@ public class SharedPrefsManager {
         long timeDiff = currentTime - lastUpdate;
 
         // Фоновая разрядка: 1% в минуту = 1% за 60000 мс
-        long minutesPassed = timeDiff / (120 * 1000); // 60 секунд = 60000 мс
+        long minutesPassed = timeDiff / (60 * 1000); // 60 секунд = 60000 мс
 
         if (minutesPassed > 0) {
             // Уменьшаем на 1% за каждую минуту
@@ -210,7 +210,8 @@ public class SharedPrefsManager {
 
             if (startDate != null) {
                 long diffInMillies = currentDate.getTime() - startDate.getTime();
-                return (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
+                // Добавляем +1 день для правильного подсчета (включая первый день)
+                return (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 2;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,6 +227,7 @@ public class SharedPrefsManager {
 
             if (startDate != null) {
                 long diffInMillies = currentDate.getTime() - startDate.getTime();
+                // Добавляем +1 день для правильного подсчета (включая первый день)
                 return (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
             }
         } catch (Exception e) {

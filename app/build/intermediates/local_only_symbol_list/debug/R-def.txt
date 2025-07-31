@@ -100,7 +100,6 @@ id relationship_title
 id secret_content_text
 id status_text
 id surface_view
-id template_button
 id today_mission_text
 id unlock_button
 id video_description

@@ -27,21 +27,12 @@
 
         <Button
             android:id="@+id/new_entry_button"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:text="@string/new_entry"
             style="@style/RomanticButton"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/template_button"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="65dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="📝 Шаблоны"
-            style="@style/RomanticButton"
-            android:layout_marginStart="8dp" />
+            android:text="@string/new_entry" />
 
     </LinearLayout>
 

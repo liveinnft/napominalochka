@@ -3692,7 +3692,6 @@ int id tag_transition_group 0x7f0801f8
 int id tag_unhandled_key_event_manager 0x7f0801f9
 int id tag_unhandled_key_listeners 0x7f0801fa
 int id tag_window_insets_animation_callback 0x7f0801fb
-int id template_button 0x7f0801fc
 int id text 0x7f0801fd
 int id text2 0x7f0801fe
 int id textEnd 0x7f0801ff
@@ -3959,9 +3958,9 @@ int layout support_simple_spinner_dropdown_item 0x7f0b0074
 int mipmap ic_launcher 0x7f0d0000
 int mipmap ic_launcher_round 0x7f0d0001
 int plurals mtrl_badge_content_description 0x7f0e0000
-int raw video1 0x7f0f0002
-int raw video2 0x7f0f0003
-int raw video3 0x7f0f0004
+int raw video1 0x7f0f0000
+int raw video2 0x7f0f0001
+int raw video3 0x7f0f0002
 int string abc_action_bar_home_description 0x7f100000
 int string abc_action_bar_up_description 0x7f100001
 int string abc_action_menu_overflow_description 0x7f100002

@@ -140,11 +140,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="💭 Цитата дня"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:text="очень важно"
                     android:textColor="@color/white"
-                    android:layout_marginBottom="12dp" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/quote_text"
@@ -188,11 +188,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🎭 Мем дня"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:text="не менее важноо"
                     android:textColor="@color/white"
-                    android:layout_marginBottom="12dp" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/meme_text"

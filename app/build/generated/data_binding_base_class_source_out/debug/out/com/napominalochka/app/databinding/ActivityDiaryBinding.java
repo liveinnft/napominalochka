@@ -25,16 +25,11 @@ public final class ActivityDiaryBinding implements ViewBinding {
   @NonNull
   public final Button newEntryButton;
 
-  @NonNull
-  public final Button templateButton;
-
   private ActivityDiaryBinding(@NonNull LinearLayout rootView,
-      @NonNull LinearLayout entriesContainer, @NonNull Button newEntryButton,
-      @NonNull Button templateButton) {
+      @NonNull LinearLayout entriesContainer, @NonNull Button newEntryButton) {
     this.rootView = rootView;
     this.entriesContainer = entriesContainer;
     this.newEntryButton = newEntryButton;
-    this.templateButton = templateButton;
   }
 
   @Override
@@ -76,14 +71,7 @@ public final class ActivityDiaryBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.template_button;
-      Button templateButton = ViewBindings.findChildViewById(rootView, id);
-      if (templateButton == null) {
-        break missingId;
-      }
-
-      return new ActivityDiaryBinding((LinearLayout) rootView, entriesContainer, newEntryButton,
-          templateButton);
+      return new ActivityDiaryBinding((LinearLayout) rootView, entriesContainer, newEntryButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

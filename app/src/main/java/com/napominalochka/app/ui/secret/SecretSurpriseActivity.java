@@ -58,7 +58,7 @@ public class SecretSurpriseActivity extends AppCompatActivity {
                 "• После завершения путешествия 🎲\n" +
                 "• Когда наступит особый день 📅\n\n" +
                 "Внутри ждет самый важный сюрприз! 💝\n\n" +
-                "Подсказка: это слово из 6 букв и описывает то, что я к тебе чувствую... ❤️");
+                "Подсказка: эта то чего мы часта называем только половинкуу!");
         
         unlockButton.setText(getString(R.string.enter_code));
         unlockButton.setVisibility(Button.VISIBLE);
@@ -107,8 +107,7 @@ public class SecretSurpriseActivity extends AppCompatActivity {
     private void showUnlockFailure() {
         new AlertDialog.Builder(this)
                 .setTitle("🔒 Неверный код")
-                .setMessage("Попробуй еще раз! 💭\n\n" +
-                           "Подсказка: это самое важное чувство между нами... ❤️")
+                .setMessage("Попробуй еще раз! 💭\n\n")
                 .setPositiveButton("Понятно 🤔", null)
                 .show();
     }

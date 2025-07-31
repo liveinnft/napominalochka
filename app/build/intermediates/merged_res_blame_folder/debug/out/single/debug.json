@@ -1,15 +1,11 @@
 [
     {
-        "merged": "com.napominalochka.app-merged_res-4:/raw_video1.mp4.flat",
-        "source": "com.napominalochka.app-main-6:/raw/video1.mp4"
-    },
-    {
         "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\layout_activity_relationship_stats.xml.flat",
         "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_relationship_stats.xml"
     },
     {
-        "merged": "com.napominalochka.app-merged_res-4:/raw_video3.mp4.flat",
-        "source": "com.napominalochka.app-main-6:/raw/video3.mp4"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\raw_video2.mp4.flat",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\raw\\video2.mp4"
     },
     {
         "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\xml_backup_rules.xml.flat",
@@ -48,12 +44,12 @@
         "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\drawable\\ic_launcher_foreground.xml"
     },
     {
-        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\layout_activity_diary.xml.flat",
-        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_diary.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\raw_video3.mp4.flat",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\raw\\video3.mp4"
     },
     {
-        "merged": "com.napominalochka.app-merged_res-4:/raw_video2.mp4.flat",
-        "source": "com.napominalochka.app-main-6:/raw/video2.mp4"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\layout_activity_diary.xml.flat",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_diary.xml"
     },
     {
         "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\drawable_battery_background.xml.flat",
@@ -66,6 +62,10 @@
     {
         "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
         "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "com.napominalochka.app-merged_res-4:/layout_activity_diary.xml.flat",
+        "source": "com.napominalochka.app-main-6:/layout/activity_diary.xml"
     },
     {
         "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-merged_res-4:\\layout_activity_mission.xml.flat",

@@ -1,50 +1,54 @@
 [
     {
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\dialog_photo_viewer.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\dialog_photo_viewer.xml"
+    },
+    {
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_joy_generator.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_joy_generator.xml"
+    },
+    {
         "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_diary.xml",
         "source": "com.napominalochka.app-main-6:/layout/activity_diary.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_secret_surprise.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_secret_surprise.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_mood_battery.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_mood_battery.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/dialog_photo_viewer.xml",
-        "source": "com.napominalochka.app-main-6:/layout/dialog_photo_viewer.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_journey_game.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_journey_game.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_joy_generator.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_joy_generator.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\dialog_video_player.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\dialog_video_player.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_mood_battery.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_mood_battery.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_thoughts_map.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_thoughts_map.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_mission.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_mission.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_secret_surprise.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_secret_surprise.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_journey_game.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_journey_game.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_relationship_stats.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_relationship_stats.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_relationship_stats.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_relationship_stats.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_gallery.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_gallery.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_thoughts_map.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_thoughts_map.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_main.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_main.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_main.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_main.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_diary.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_diary.xml"
     },
     {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/activity_gallery.xml",
-        "source": "com.napominalochka.app-main-6:/layout/activity_gallery.xml"
-    },
-    {
-        "merged": "com.napominalochka.app-mergeDebugResources-3:/layout/dialog_video_player.xml",
-        "source": "com.napominalochka.app-main-6:/layout/dialog_video_player.xml"
+        "merged": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-mergeDebugResources-3:\\layout\\activity_mission.xml",
+        "source": "C:\\Users\\Вячеслав\\.gradle\\daemon\\8.12\\com.napominalochka.app-main-6:\\layout\\activity_mission.xml"
     }
 ]

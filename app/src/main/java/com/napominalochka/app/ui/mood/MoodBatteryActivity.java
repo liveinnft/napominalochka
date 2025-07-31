@@ -22,7 +22,7 @@ public class MoodBatteryActivity extends AppCompatActivity {
     private TextView loveLevelText;
     private TextView batteryStatusText;
     private Button chargeButton;
-    
+
     private SharedPrefsManager prefsManager;
 
     @Override
@@ -35,6 +35,11 @@ public class MoodBatteryActivity extends AppCompatActivity {
         initViews();
         setupBatteryLevel();
         setupChargeButton();
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Батарейка настроения");
+        }
     }
 
     private void initViews() {
@@ -50,12 +55,12 @@ public class MoodBatteryActivity extends AppCompatActivity {
         // Start active decay while app is open
         startActiveBatteryDecay();
     }
-    
+
     private void startActiveBatteryDecay() {
         // Active decay every 10 seconds while app is open
         batteryProgressBar.postDelayed(activeDecayRunnable, 10000);
     }
-    
+
     private final Runnable activeDecayRunnable = new Runnable() {
         @Override
         public void run() {
@@ -64,8 +69,11 @@ public class MoodBatteryActivity extends AppCompatActivity {
                 int newLevel = Math.max(0, currentLevel - 1); // Decrease by 1% every 10 seconds
                 prefsManager.setLoveLevel(newLevel);
                 updateBatteryDisplay(newLevel);
-                
+
                 // Schedule next decay
+                batteryProgressBar.postDelayed(this, 10000);
+            } else {
+                // If battery is at 0%, still schedule next check in case it gets charged
                 batteryProgressBar.postDelayed(this, 10000);
             }
         }
@@ -78,50 +86,47 @@ public class MoodBatteryActivity extends AppCompatActivity {
         animator.start();
 
         // Update text
-        loveLevelText.setText(getString(R.string.love_level, level));
-        
+        loveLevelText.setText("Уровень любви: " + level + "%");
+
         // Update status text based on level
         String statusText;
+        int textColor;
+
         if (level < 25) {
             statusText = "коть, мне нужна подзарядочка от тебя!! 💔";
-            batteryStatusText.setTextColor(getColor(R.color.battery_low));
+            textColor = getColor(android.R.color.holo_red_light);
         } else if (level < 50) {
             statusText = "котенок, дай немножко любви пожалуйста 💛";
-            batteryStatusText.setTextColor(getColor(R.color.battery_medium));
+            textColor = getColor(android.R.color.holo_orange_light);
         } else if (level < 75) {
             statusText = "кис, так хорошо!! я чувствую твою любовь 💚";
-            batteryStatusText.setTextColor(getColor(R.color.battery_high));
+            textColor = getColor(android.R.color.holo_green_light);
         } else {
             statusText = "я до одурения заряжен твоей любовью!! 💖";
-            batteryStatusText.setTextColor(getColor(R.color.battery_full));
+            textColor = getColor(android.R.color.holo_blue_light);
         }
+
         batteryStatusText.setText(statusText);
+        batteryStatusText.setTextColor(textColor);
     }
 
     private void setupChargeButton() {
         chargeButton.setOnClickListener(v -> {
-            // Prevent spam clicking
-            if (!chargeButton.isEnabled()) return;
-            
             // Add charge animation
             animateChargeButton();
-            
+
             // Get current level before charging
             int currentLevel = prefsManager.getLoveLevel();
-            
+
             // Charge battery by 2%
             prefsManager.chargeBattery();
             int newLevel = prefsManager.getLoveLevel();
             updateBatteryDisplay(newLevel);
-            
+
             // Show love message only when battery reaches 100%
             if (currentLevel < 100 && newLevel >= 100) {
                 showLoveMessage();
             }
-                
-            // Add cooldown to prevent spam (2 seconds)
-            chargeButton.setEnabled(false);
-            chargeButton.postDelayed(() -> chargeButton.setEnabled(true), 2000);
         });
     }
 
@@ -137,8 +142,22 @@ public class MoodBatteryActivity extends AppCompatActivity {
     }
 
     private void showLoveMessage() {
-        String randomMessage = AppTexts.LOVE_MESSAGES[new Random().nextInt(AppTexts.LOVE_MESSAGES.length)];
-        
+        // Используем встроенные сообщения или fallback
+        String randomMessage;
+        try {
+            randomMessage = AppTexts.LOVE_MESSAGES[new Random().nextInt(AppTexts.LOVE_MESSAGES.length)];
+        } catch (Exception e) {
+            // Fallback сообщения если AppTexts недоступен
+            String[] fallbackMessages = {
+                    "🤍 коткночек мой любимый, ты у меня самая самая!!",
+                    "💕 мы со всем всем справимся, я клянусь!!",
+                    "🌟 ты моя огромная умничка и я горжусь тобой прям!!",
+                    "🫂 кис, я тебя не оставлю какая ситуация бы не случилась",
+                    "💪 при любой возможности тебе помочь я это сделаю!!"
+            };
+            randomMessage = fallbackMessages[new Random().nextInt(fallbackMessages.length)];
+        }
+
         new AlertDialog.Builder(this)
                 .setTitle("💖 Батарейка полностью заряжена!")
                 .setMessage("коть, ты меня до одурения зарядил своей любовью!! 💕\n\n" + randomMessage)
@@ -155,7 +174,7 @@ public class MoodBatteryActivity extends AppCompatActivity {
         // Restart active decay
         startActiveBatteryDecay();
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -172,5 +191,11 @@ public class MoodBatteryActivity extends AppCompatActivity {
         if (batteryProgressBar != null) {
             batteryProgressBar.removeCallbacks(activeDecayRunnable);
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

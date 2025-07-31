@@ -34,7 +34,7 @@ public class GalleryConfig {
 
             {"photo", "photo12.jpg", "рисуночееек", "а вот твой прекрасныц и один из моих любимых рисуночков от тебяяяячя, пхпхп"},
 
-            {"photo", "photo13.jpg", "ТВОЯ ПЯТОЧКААА😋😋😈😘🤤🤤😘"}
+            {"photo", "photo13.jpg", "ПЯТКА", "ТВОЯ ПЯТОЧКААА😋😋😈😘🤤🤤😘"}
     };
 
     public static boolean isVideo(String[] item) {

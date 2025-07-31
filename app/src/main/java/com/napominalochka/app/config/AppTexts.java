@@ -3,7 +3,7 @@ package com.napominalochka.app.config;
 public class AppTexts {
 
     // ========== СЕКРЕТНЫЙ КОД ==========
-    public static final String SECRET_CODE = "ЛЮБОВЬ";
+    public static final String SECRET_CODE = "ШИШЕЧКА";
 
     // ========== СООБЩЕНИЯ ЛЮБВИ (БАТАРЕЙКА) ==========
     public static final String[] LOVE_MESSAGES = {

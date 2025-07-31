@@ -9,7 +9,7 @@ import java.util.Locale;
 
 public class SharedPrefsManager {
     private static final String PREF_NAME = "napominalochka_prefs";
-    
+
     // Keys
     private static final String KEY_LOVE_LEVEL = "love_level";
     private static final String KEY_LAST_UPDATE_DATE = "last_update_date";
@@ -23,7 +23,7 @@ public class SharedPrefsManager {
     private static final String KEY_SMILES_SENT = "smiles_sent";
     private static final String KEY_SECRET_UNLOCKED = "secret_unlocked";
     private static final String KEY_LAST_MISSION_DATE = "last_mission_date";
-    
+
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
@@ -40,16 +40,19 @@ public class SharedPrefsManager {
     }
 
     public int getLoveLevel() {
-        // No background decay - only active decay when app is open
+        // Проверяем фоновую разрядку при каждом получении уровня
+        checkAndUpdateBackgroundDecay();
         return sharedPreferences.getInt(KEY_LOVE_LEVEL, 75); // Default 75%
     }
-    
+
     public void chargeBattery() {
+        // Сначала обновляем уровень с учетом фоновой разрядки
+        checkAndUpdateBackgroundDecay();
         int currentLevel = sharedPreferences.getInt(KEY_LOVE_LEVEL, 75);
         int newLevel = Math.min(100, currentLevel + 2); // Increase by 2%
         setLoveLevel(newLevel);
     }
-    
+
     private void updateLastBatteryUpdate() {
         editor.putLong(KEY_LAST_BATTERY_UPDATE, System.currentTimeMillis());
     }
@@ -58,33 +61,33 @@ public class SharedPrefsManager {
         long lastUpdate = sharedPreferences.getLong(KEY_LAST_BATTERY_UPDATE, System.currentTimeMillis());
         long currentTime = System.currentTimeMillis();
         long timeDiff = currentTime - lastUpdate;
-        
-        // Calculate how many 10-second intervals have passed
-        long intervals = timeDiff / (10 * 1000); // 10 seconds = 10000 ms
-        
-        if (intervals > 0) {
-            // Decrease 1% for each 10-second interval that passed
+
+        // Фоновая разрядка: 1% в минуту = 1% за 60000 мс
+        long minutesPassed = timeDiff / (120 * 1000); // 60 секунд = 60000 мс
+
+        if (minutesPassed > 0) {
+            // Уменьшаем на 1% за каждую минуту
             int currentLevel = sharedPreferences.getInt(KEY_LOVE_LEVEL, 75);
-            int decreaseAmount = (int) Math.min(intervals, currentLevel); // Don't go below 0
+            int decreaseAmount = (int) Math.min(minutesPassed, currentLevel); // Не идем ниже 0
             int newLevel = Math.max(0, currentLevel - decreaseAmount);
-            
-            // Update the level and timestamp
+
+            // Обновляем уровень и временную метку
             editor.putInt(KEY_LOVE_LEVEL, newLevel);
             updateLastBatteryUpdate();
             editor.apply();
         }
     }
-    
+
     private void checkAndUpdateDailyDecay() {
         String lastUpdateDate = sharedPreferences.getString(KEY_LAST_UPDATE_DATE, "");
         String currentDate = getCurrentDate();
-        
+
         if (!lastUpdateDate.equals(currentDate)) {
             // New day - decrease love level by 10-20%
             int currentLevel = sharedPreferences.getInt(KEY_LOVE_LEVEL, 75);
             int decrease = (int) (Math.random() * 11) + 10; // 10-20%
             int newLevel = Math.max(0, currentLevel - decrease);
-            
+
             editor.putInt(KEY_LOVE_LEVEL, newLevel);
             editor.putString(KEY_LAST_UPDATE_DATE, currentDate);
             editor.apply();
@@ -133,7 +136,7 @@ public class SharedPrefsManager {
         // Fixed relationship start date - 6 октября 2024
         return "2024-10-06";
     }
-    
+
     public String getCommunicationStartDate() {
         // Fixed communication start date - 20 сентября 2024
         return "2024-09-20";
@@ -204,7 +207,7 @@ public class SharedPrefsManager {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date startDate = sdf.parse(getRelationshipStartDate());
             Date currentDate = new Date();
-            
+
             if (startDate != null) {
                 long diffInMillies = currentDate.getTime() - startDate.getTime();
                 return (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
@@ -214,13 +217,13 @@ public class SharedPrefsManager {
         }
         return 1;
     }
-    
+
     public int getDaysCommunicating() {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date startDate = sdf.parse(getCommunicationStartDate());
             Date currentDate = new Date();
-            
+
             if (startDate != null) {
                 long diffInMillies = currentDate.getTime() - startDate.getTime();
                 return (int) (diffInMillies / (1000 * 60 * 60 * 24)) + 1;
